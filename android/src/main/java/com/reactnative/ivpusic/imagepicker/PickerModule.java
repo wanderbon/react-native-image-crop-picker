@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -15,6 +16,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import androidx.core.app.ActivityCompat;
@@ -396,24 +398,42 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         setConfiguration(options);
         resultCollector.setup(promise, false);
 
-        String imageName = UUID.randomUUID().toString() + ".jpg";
+        final String imageName = UUID.randomUUID().toString() + ".jpg";
 
-        DownloadImage downloadImage = new DownloadImage(activity.getApplicationContext(), imageName);
-        downloadImage.execute(options.getString("path"));
-
-        downloadImage.loadImageBitmap(activity.getApplicationContext(), imageName);
-
-        File file = activity.getApplicationContext().getFileStreamPath(imageName);
-
-        final Uri uri = Uri.fromFile(file);
-
-        permissionsCheck(activity, promise, Collections.singletonList(Manifest.permission.WRITE_EXTERNAL_STORAGE), new Callable<Void>() {
+        Callback callback = new Callback() {
             @Override
-            public Void call() {
-                startCropping(activity, uri);
-                return null;
+            public void invoke(Object... args) {
+                File file = activity.getApplicationContext().getFileStreamPath(imageName);
+
+                final Uri uri = Uri.fromFile(file);
+
+                permissionsCheck(activity, promise, Collections.singletonList(Manifest.permission.WRITE_EXTERNAL_STORAGE), new Callable<Void>() {
+                    @Override
+                    public Void call() {
+                        startCropping(activity, uri);
+                        return null;
+                    }
+                });
             }
-        });
+        };
+
+        DownloadImage downloadImage = new DownloadImage(activity.getApplicationContext(), imageName, callback);
+        downloadImage.execute(options.getString("path"));
+    }
+
+    private Bitmap loadImageBitmap(Context context, String imageName) {
+        Bitmap bitmap = null;
+        FileInputStream fiStream;
+        try {
+            fiStream = context.openFileInput(imageName);
+            bitmap = BitmapFactory.decodeStream(fiStream);
+            fiStream.close();
+        } catch (Exception e) {
+            Log.d("saveImage", "Exception 3, Something went wrong!");
+            e.printStackTrace();
+        }
+
+        return bitmap;
     }
 
     private String getBase64StringFromFile(String absoluteFilePath) {

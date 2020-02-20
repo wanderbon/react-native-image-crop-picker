@@ -6,18 +6,21 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 
+import com.facebook.react.bridge.Callback;
+
 class DownloadImage extends AsyncTask<String, Void, Bitmap> {
     private Context mContext;
     private String mImageName;
+    private Callback mCallback;
 
-    DownloadImage(Context mContext, String mImageName) {
+    DownloadImage(Context mContext, String mImageName, Callback mCallback) {
         this.mContext = mContext;
         this.mImageName = mImageName;
+        this.mCallback = mCallback;
     }
 
     private String TAG = "DownloadImage";
@@ -47,26 +50,12 @@ class DownloadImage extends AsyncTask<String, Void, Bitmap> {
         FileOutputStream foStream;
         try {
             foStream = context.openFileOutput(imageName, Context.MODE_PRIVATE);
-            b.compress(Bitmap.CompressFormat.PNG, 100, foStream);
+            b.compress(Bitmap.CompressFormat.JPEG, 100, foStream);
             foStream.close();
+            mCallback.invoke();
         } catch (Exception e) {
             Log.d("saveImage", "Exception 2, Something went wrong!");
             e.printStackTrace();
         }
-    }
-
-    public Bitmap loadImageBitmap(Context context, String imageName) {
-        Bitmap bitmap = null;
-        FileInputStream fiStream;
-        try {
-            fiStream = context.openFileInput(imageName);
-            bitmap = BitmapFactory.decodeStream(fiStream);
-            fiStream.close();
-        } catch (Exception e) {
-            Log.d("saveImage", "Exception 3, Something went wrong!");
-            e.printStackTrace();
-        }
-
-        return bitmap;
     }
 }
