@@ -43,6 +43,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.CookieHandler;
+import java.net.CookieManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -398,27 +400,17 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         setConfiguration(options);
         resultCollector.setup(promise, false);
 
-        final String imageName = UUID.randomUUID().toString() + ".jpg";
+        CookieHandler.setDefault(new CookieManager());
 
-        Callback callback = new Callback() {
+        final Uri uri = Uri.parse(options.getString("path"));
+
+        permissionsCheck(activity, promise, Collections.singletonList(Manifest.permission.WRITE_EXTERNAL_STORAGE), new Callable<Void>() {
             @Override
-            public void invoke(Object... args) {
-                File file = activity.getApplicationContext().getFileStreamPath(imageName);
-
-                final Uri uri = Uri.fromFile(file);
-
-                permissionsCheck(activity, promise, Collections.singletonList(Manifest.permission.WRITE_EXTERNAL_STORAGE), new Callable<Void>() {
-                    @Override
-                    public Void call() {
-                        startCropping(activity, uri);
-                        return null;
-                    }
-                });
+            public Void call() {
+                startCropping(activity, uri);
+                return null;
             }
-        };
-
-        DownloadImage downloadImage = new DownloadImage(activity.getApplicationContext(), imageName, callback);
-        downloadImage.execute(options.getString("path"));
+        });
     }
 
     private Bitmap loadImageBitmap(Context context, String imageName) {
