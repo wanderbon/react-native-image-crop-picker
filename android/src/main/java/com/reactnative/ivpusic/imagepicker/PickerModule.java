@@ -401,6 +401,8 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         DownloadImage downloadImage = new DownloadImage(activity.getApplicationContext(), imageName);
         downloadImage.execute(options.getString("path"));
 
+        downloadImage.loadImageBitmap(activity.getApplicationContext(), imageName);
+
         File file = activity.getApplicationContext().getFileStreamPath(imageName);
 
         final Uri uri = Uri.fromFile(file);
