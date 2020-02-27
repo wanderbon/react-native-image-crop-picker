@@ -13,15 +13,18 @@ import android.graphics.Color;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.util.Base64;
 import android.util.Log;
+import android.view.View;
 import android.webkit.MimeTypeMap;
 
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import com.facebook.react.bridge.ActivityEventListener;
@@ -685,10 +688,7 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
 
         FragmentManager fragmentManager = new FragmentActivity().getSupportFragmentManager();
 
-        fragmentManager.beginTransaction()
-                .add(R.id.fragment_container, fragment, UCropFragment.TAG)
-                .commitAllowingStateLoss();
-
+        fragmentManager.beginTransaction().add(fragment, UCropFragment.TAG).commit();
 //        uCrop.start(activity);
     }
 
