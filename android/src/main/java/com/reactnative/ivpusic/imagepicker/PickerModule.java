@@ -13,20 +13,14 @@ import android.graphics.Color;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.app.Fragment;
 import android.util.Base64;
 import android.util.Log;
-import android.view.View;
 import android.webkit.MimeTypeMap;
 
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Callback;
@@ -43,8 +37,6 @@ import com.facebook.react.modules.core.PermissionListener;
 
 import com.yalantis.ucrop.UCrop;
 import com.yalantis.ucrop.UCropActivity;
-import com.yalantis.ucrop.UCropFragment;
-import com.yalantis.ucrop.UCropFragmentCallback;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -61,7 +53,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
-class PickerModule extends ReactContextBaseJavaModule implements ActivityEventListener, UCropFragmentCallback {
+class PickerModule extends ReactContextBaseJavaModule implements ActivityEventListener {
 
     private static final int IMAGE_PICKER_REQUEST = 61110;
     private static final int CAMERA_PICKER_REQUEST = 61111;
@@ -111,8 +103,6 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
     private ResultCollector resultCollector = new ResultCollector();
     private Compression compression = new Compression();
     private ReactApplicationContext reactContext;
-
-    private UCropFragment fragment;
 
     PickerModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -686,18 +676,7 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
             uCrop.withAspectRatio(width, height);
         }
 
-        getCurrentActivity().findViewById(R.id.fragment_container);
-
-//        fragment = uCrop.getFragment(uCrop.getIntent(reactContext).getExtras());
-//
-//        FragmentActivity fragmentActivity = new FragmentActivity();
-//
-//        FragmentManager fragmentManager = fragmentActivity.getSupportFragmentManager();
-//
-//        fragmentManager.beginTransaction().add(fragment, UCropFragment.TAG).commit();
-////
-////        uCrop.start(activity);
-//        uCrop.start(getReactApplicationContext(), fragment);
+        uCrop.start(activity);
     }
 
     private void imagePickerResult(Activity activity, final int requestCode, final int resultCode, final Intent data) {
@@ -873,14 +852,5 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         map.putInt("height", data.getIntExtra(UCrop.EXTRA_OUTPUT_IMAGE_HEIGHT, DEFAULT_VALUE));
 
         return map;
-    }
-
-    @Override
-    public void loadingProgress(boolean showLoader) {
-    }
-
-    @Override
-    public void onCropFinish(UCropFragment.UCropResult result) {
-        Log.i("FRAGMENT_RESULT", result + "");
     }
 }
