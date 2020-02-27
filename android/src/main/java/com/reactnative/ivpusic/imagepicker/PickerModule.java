@@ -2,6 +2,7 @@ package com.reactnative.ivpusic.imagepicker;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.ClipData;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -17,7 +18,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -687,9 +687,9 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
 
         fragment = uCrop.getFragment(uCrop.getIntent(reactContext).getExtras());
 
-//        FragmentManager fragmentManager = new FragmentActivity().getSupportFragmentManager();
-//
+//        FragmentManager fragmentManager =  getCurrentActivity().getFragmentManager();
 //        fragmentManager.beginTransaction().add(fragment, UCropFragment.TAG).commit();
+//
 //        uCrop.start(activity);
         uCrop.start(getReactApplicationContext(), fragment);
     }
