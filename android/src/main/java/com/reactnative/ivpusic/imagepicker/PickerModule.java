@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.Fragment;
 import android.util.Base64;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
@@ -675,6 +676,7 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         }
 
         uCrop.start(activity);
+        uCrop.start(getReactApplicationContext(), new Fragment());
     }
 
     private void imagePickerResult(Activity activity, final int requestCode, final int resultCode, final Intent data) {
