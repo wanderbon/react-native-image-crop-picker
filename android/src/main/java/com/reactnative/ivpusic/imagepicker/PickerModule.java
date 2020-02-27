@@ -873,5 +873,6 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
 
     @Override
     public void onCropFinish(UCropFragment.UCropResult result) {
+        Log.i("FRAGMENT_RESULT", result + "");
     }
 }
