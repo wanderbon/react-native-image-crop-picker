@@ -16,7 +16,7 @@
         </provider>
 
         <activity
-            android:name="com.yalantis.ucrop.UCropActivity"
+            android:name="com.yalantis.ucrop.UCropFragment"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
     </application>
 

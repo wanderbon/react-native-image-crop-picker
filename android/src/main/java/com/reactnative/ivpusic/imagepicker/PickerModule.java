@@ -2,7 +2,6 @@ package com.reactnative.ivpusic.imagepicker;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.FragmentManager;
 import android.content.ClipData;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -17,7 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.Fragment;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -26,6 +25,8 @@ import android.webkit.MimeTypeMap;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Callback;
@@ -685,13 +686,18 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
             uCrop.withAspectRatio(width, height);
         }
 
-        fragment = uCrop.getFragment(uCrop.getIntent(reactContext).getExtras());
+        getCurrentActivity().findViewById(R.id.fragment_container);
 
-        FragmentManager fragmentManager = getCurrentActivity().getFragmentManager();
-        fragmentManager.beginTransaction().add(fragment, UCropFragment.TAG).commit();
+//        fragment = uCrop.getFragment(uCrop.getIntent(reactContext).getExtras());
 //
-//        uCrop.start(activity);
-        uCrop.start(getReactApplicationContext(), fragment);
+//        FragmentActivity fragmentActivity = new FragmentActivity();
+//
+//        FragmentManager fragmentManager = fragmentActivity.getSupportFragmentManager();
+//
+//        fragmentManager.beginTransaction().add(fragment, UCropFragment.TAG).commit();
+////
+////        uCrop.start(activity);
+//        uCrop.start(getReactApplicationContext(), fragment);
     }
 
     private void imagePickerResult(Activity activity, final int requestCode, final int resultCode, final Intent data) {
