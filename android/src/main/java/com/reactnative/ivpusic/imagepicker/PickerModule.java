@@ -676,7 +676,6 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         }
 
         uCrop.start(activity);
-        uCrop.start(getReactApplicationContext(), new Fragment());
     }
 
     private void imagePickerResult(Activity activity, final int requestCode, final int resultCode, final Intent data) {
