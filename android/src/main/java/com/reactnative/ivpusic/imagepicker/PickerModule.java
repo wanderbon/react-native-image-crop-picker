@@ -687,8 +687,8 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
 
         fragment = uCrop.getFragment(uCrop.getIntent(reactContext).getExtras());
 
-//        FragmentManager fragmentManager =  getCurrentActivity().getFragmentManager();
-//        fragmentManager.beginTransaction().add(fragment, UCropFragment.TAG).commit();
+        FragmentManager fragmentManager = getCurrentActivity().getFragmentManager();
+        fragmentManager.beginTransaction().add(fragment, UCropFragment.TAG).commit();
 //
 //        uCrop.start(activity);
         uCrop.start(getReactApplicationContext(), fragment);
