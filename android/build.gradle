@@ -13,10 +13,26 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.0'
+        classpath 'com.android.tools.build:gradle:3.6.1'
     }
 }
 
+def isReleaseBuild() {
+    return version.contains("SNAPSHOT") == false
+}
+
+allprojects {
+    version = VERSION_NAME
+    group = GROUP
+
+    repositories {
+        jcenter()
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
+        }
+    }
+}
 
 apply plugin: 'com.android.library'
 
@@ -45,9 +61,4 @@ repositories {
 dependencies {
     implementation 'com.facebook.react:react-native:+'
     implementation "androidx.core:core-ktx:+"
-    implementation "androidx.appcompat:appcompat:${androidx_appcompat_version}"
-    implementation "androidx.exifinterface:exifinterface:${androidx_exifinterface_version}"
-    implementation "androidx.transition:transition:${androidx_transition_version}"
-    implementation "com.squareup.okhttp3:okhttp:3.12.1"
-    implementation project(":ucrop")
 }

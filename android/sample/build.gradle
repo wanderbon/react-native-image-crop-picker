@@ -1,17 +1,16 @@
-apply plugin: 'com.android.library'
+apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
-
     defaultConfig {
+        applicationId "com.yalantis.ucrop.sample"
         minSdkVersion 14
         targetSdkVersion 28
-        versionCode 25
-        versionName "2.2.4-native"
-
-        vectorDrawables.useSupportLibrary = true
+        versionCode 13
+        versionName "1.2.4"
     }
+    flavorDimensions "default"
     buildTypes {
         release {
             minifyEnabled false
@@ -25,18 +24,19 @@ android {
     lintOptions {
         abortOnError false
     }
-
-    resourcePrefix 'ucrop_'
-
-    sourceSets.main {
-        jni.srcDirs = []
+    productFlavors {
+        activity {
+            buildConfigField("int","RequestMode", "1")
+        }
+        fragment {
+            buildConfigField("int","RequestMode", "2")
+        }
     }
-
 }
 
 dependencies {
     implementation "androidx.appcompat:appcompat:${androidx_appcompat_version}"
-    implementation "androidx.exifinterface:exifinterface:${androidx_exifinterface_version}"
-    implementation "androidx.transition:transition:${androidx_transition_version}"
-    implementation "com.squareup.okhttp3:okhttp:3.12.1"
+    implementation "androidx.core:core:${androidx_core_version}"
+    implementation "androidx.constraintlayout:constraintlayout:${constraintlayout_version}"
+    implementation project(':ucrop')
 }

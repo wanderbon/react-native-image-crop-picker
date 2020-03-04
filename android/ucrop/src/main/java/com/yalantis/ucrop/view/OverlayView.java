@@ -298,7 +298,7 @@ public class OverlayView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (mCropViewRect.isEmpty() || event.getPointerCount() > 1) {
+        if (mCropViewRect.isEmpty() || mFreestyleCropMode == FREESTYLE_CROP_MODE_DISABLE) {
             return false;
         }
 
