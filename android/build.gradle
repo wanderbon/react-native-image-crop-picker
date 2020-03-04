@@ -56,10 +56,14 @@ repositories {
     mavenCentral()
     jcenter()
     maven { url "https://jitpack.io" }
+
+    flatDir {
+        dir 'libs'
+    }
 }
 
 dependencies {
     implementation 'com.facebook.react:react-native:+'
     implementation "androidx.core:core-ktx:+"
-    implementation project(":ucrop")
+    implementation (name: 'ucrop', ext: 'aar')
 }
