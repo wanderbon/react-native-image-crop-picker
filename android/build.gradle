@@ -64,6 +64,6 @@ repositories {
 
 dependencies {
     implementation 'com.facebook.react:react-native:+'
-    implementation "androidx.core:core-ktx:+"
-    implementation fileTree(dir: "libs", include: ["*.aar"])
+    implementation 'androidx.core:core-ktx:+'
+    implementation project(':ucrop')
 }
