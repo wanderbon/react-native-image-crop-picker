@@ -61,5 +61,5 @@ repositories {
 dependencies {
     implementation 'com.facebook.react:react-native:+'
     implementation 'androidx.core:core-ktx:+'
-    implementation project('ucrop')
+    implementation files("libs/ucrop.aar")
 }
