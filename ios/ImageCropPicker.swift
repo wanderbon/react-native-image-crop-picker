@@ -12,7 +12,7 @@ import Photos
 
 let ERROR_PICKER_UNAUTHORIZED_KEY = "E_PERMISSION_MISSING"
 let ERROR_PICKER_UNAUTHORIZED_MSG = "Cannot access images. Please allow access if you want to be able to select images."
-let ERROR_CROPPER_CANCEL_KEY = "E_CROPPER_CANCELLED"
+let ERROR_CROPPER_CANCEL_KEY = "E_PICKER_CANCELLED"
 let ERROR_CROPPER_CANCEL_MSG = "User cancelled image cropping"
 
 
