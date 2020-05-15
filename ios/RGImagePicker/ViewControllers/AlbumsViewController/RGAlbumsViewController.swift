@@ -31,11 +31,43 @@ class RGAlbumsViewController: UIViewController {
         
         authorizationStatus = PHPhotoLibrary.authorizationStatus()
         
-        fetchAlbums()
+        if (authorizationStatus == .denied) {
+            alertMedaAccess()
+        } else if (authorizationStatus == .authorized) {
+            fetchAlbums()
+        }
         
         // Register observer
         PHPhotoLibrary.shared().register(self)
     }
+    
+    
+    func alertMedaAccess() {
+        guard let language = Locale.current.languageCode else { return }
+        
+        let title = language == "ru" ? "Медиа контент недоступен" : "Media Library Unavailable"
+        let message = language == "ru" ? "Необходимо разрешить приложению доступ к медиа данным" : "Permission is required to access media data"
+        let settings = language == "ru" ? "Настройки" : "Settings"
+        let cancel = language == "ru" ? "Отмена" : "Cancel"
+        
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+
+        let settingsAction = UIAlertAction(title: settings, style: .default) { (_) -> Void in
+            let settingsUrl = URL(string: UIApplication.openSettingsURLString)
+            if let url = settingsUrl {
+                DispatchQueue.main.async {
+                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                }
+            }
+        }
+        let cancelAction = UIAlertAction(title: cancel, style: .cancel, handler: nil)
+        alertController.addAction(settingsAction)
+        alertController.addAction(cancelAction)
+        
+        present(alertController, animated: true, completion: nil)
+    }
+    
+    
     
     // Fetch user albums and smart albums
     
@@ -70,9 +102,9 @@ class RGAlbumsViewController: UIViewController {
     func updateAssetCollections() {
         // Filter albums
         
-        // guard let imagePickerController = self.imagePickerController else {
-            // return
-        // }
+        guard let imagePickerController = self.imagePickerController else {
+            return
+        }
         
         if let assetCollectionSubtypes = self.imagePickerController?.assetCollectionSubtypes {
             var smartAlbums = Dictionary <PHAssetCollectionSubtype, [PHAssetCollection]> (minimumCapacity: assetCollectionSubtypes.count)
@@ -94,27 +126,35 @@ class RGAlbumsViewController: UIViewController {
             }
             
             var assetCollections = [PHAssetCollection]()
+            let options = PHFetchOptions.create(mediaType: imagePickerController.mediaType)
+            options.fetchLimit = 1
             
             // Fetch smart albums
             for assetCollectionSubtype in assetCollectionSubtypes {
                 if let collections = smartAlbums[assetCollectionSubtype] {
-                    /*
+                    
                     for collection in collections {
-                        let options = PHFetchOptions.create(mediaType: imagePickerController.mediaType)
-                        options.fetchLimit = 1
                         let assets = PHAsset.fetchAssets(in: collection, options: options)
                         
                         if assets.count > 0 {
                             assetCollections.append(collection)
                         }
-                    }*/
+                    }
                     
-                    assetCollections.append(contentsOf: collections)
+                    // assetCollections.append(contentsOf: collections)
                 }
             }
             
             // Fetch user albums
-            assetCollections.append(contentsOf: userAlbums)
+            // assetCollections.append(contentsOf: userAlbums)
+            
+            for collection in userAlbums {
+                let assets = PHAsset.fetchAssets(in: collection, options: options)
+                
+                if assets.count > 0 {
+                    assetCollections.append(collection)
+                }
+            }
             
             self.assetCollections = assetCollections
         }
