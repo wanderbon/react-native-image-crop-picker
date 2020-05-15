@@ -19,8 +19,6 @@ extension RGAssetsViewController {
     // MARK: - UICollectionViewDelegate
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("didSelectItemAt!!!!!!!!!!!!")
-        
         if let cell = collectionView.cellForItem(at: indexPath) as? RGAssetCell,
             let asset = self.fetchResult?[indexPath.item], asset.mediaType == .image {
             let targetSize = CGSize(width: asset.pixelWidth, height: asset.pixelHeight)
@@ -59,7 +57,7 @@ extension RGAssetsViewController {
     
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 20, left: 10, bottom: 20, right: 10)
+        return UIEdgeInsets(top: 15, left: 10, bottom: 20, right: 10)
     }
 }
 
@@ -76,7 +74,7 @@ extension RGAssetsViewController: UICollectionViewDelegateFlowLayout {
             imagePickerController.numberOfColumnsInLandscape :
             imagePickerController.numberOfColumnsInPortrait
         
-        let width = (self.view.frame.width - 12.0 * (CGFloat(numberOfColumns) - 1.0)) / CGFloat(numberOfColumns)
+        let width = (self.view.frame.width - 20.0 * (CGFloat(numberOfColumns) - 1.0)) / CGFloat(numberOfColumns)
         
         return CGSize(width: width, height: width)
     }
