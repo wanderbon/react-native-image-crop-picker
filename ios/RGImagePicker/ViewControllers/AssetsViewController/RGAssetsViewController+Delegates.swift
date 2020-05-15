@@ -19,8 +19,6 @@ extension RGAssetsViewController {
     // MARK: - UICollectionViewDelegate
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("didSelectItemAt!!!!!!!!!!!!")
-        
         if let cell = collectionView.cellForItem(at: indexPath) as? RGAssetCell,
             let asset = self.fetchResult?[indexPath.item], asset.mediaType == .image {
             let targetSize = CGSize(width: asset.pixelWidth, height: asset.pixelHeight)
