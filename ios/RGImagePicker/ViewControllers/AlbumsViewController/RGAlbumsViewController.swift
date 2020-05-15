@@ -33,7 +33,7 @@ class RGAlbumsViewController: UIViewController {
         
         if (authorizationStatus == .denied) {
             alertMedaAccess()
-        } else if (authorizationStatus == .authorized) {
+        } else {
             fetchAlbums()
         }
         
