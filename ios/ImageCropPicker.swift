@@ -34,7 +34,9 @@ class ImageCropPicker: NSObject {
         return root
     }
     
+    var imagePathForCropping: String?
     var imageForCropping: UIImage?
+    
     var resolve: RCTPromiseResolveBlock?
     var reject: RCTPromiseRejectBlock?
     
@@ -43,7 +45,9 @@ class ImageCropPicker: NSObject {
                     resolver resolve: @escaping RCTPromiseResolveBlock,
                     rejecter reject: @escaping RCTPromiseRejectBlock) -> Void {
         
+        self.imagePathForCropping = nil
         self.imageForCropping = nil
+        
         self.resolve = resolve
         self.reject = reject
         
@@ -108,6 +112,7 @@ class ImageCropPicker: NSObject {
             let image = UIImage(data: data)
         else { return }
         
+        self.imagePathForCropping = path
         self.imageForCropping = image
         
         DispatchQueue.main.async {
@@ -168,9 +173,19 @@ extension ImageCropPicker: CropViewControllerDelegate {
             ]
             
             self.resolve?(response)
-        } else {
-            self.reject?(ERROR_CROPPER_SAME_IMAGE_KEY, ERROR_CROPPER_SAME_IMAGE_MSG, nil)
+        } else if let path = self.imagePathForCropping,
+            let image = imageForCropping {
+
             self.reject = nil
+            
+            let response: [String : Any] = [
+                "path" : path,
+                "width" : Int(image.size.width),
+                "height" : Int(image.size.height),
+                "fileName" : "\(UUID().uuidString).JPG"
+            ]
+            
+            self.resolve?(response)
         }
     }
     
