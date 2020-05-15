@@ -224,8 +224,9 @@ class RGAssetsViewController: UICollectionViewController {
             }
             
             dispatchGroup.notify(queue: .main) {
-                imagePickerController.delegate?.imagePickerController(imagePickerController, didFinishPickingAssets: resultAssets)
-                self.dismiss(animated: true)
+                self.dismiss(animated: true) {
+                    imagePickerController.delegate?.imagePickerController(imagePickerController, didFinishPickingAssets: resultAssets)
+                }
             }
         }
     }
