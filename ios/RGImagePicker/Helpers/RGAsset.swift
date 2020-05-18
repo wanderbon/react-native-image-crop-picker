@@ -23,6 +23,10 @@ struct RGAsset {
         return RGAsset(fileName: filename, filePath: filepath, width: asset.pixelWidth, height: asset.pixelHeight)
     }
     
+    static var empty: RGAsset {
+        return RGAsset(fileName: "", filePath: "", width: 0, height: 0)
+    }
+    
     func toDictionary() -> [String : Any] {
         return [
             "fileName" : fileName,

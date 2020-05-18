@@ -156,13 +156,7 @@ class RGAssetsViewController: UICollectionViewController {
             let assets = imagePickerController.selectedAssets.array as? [PHAsset] {
             
             let dispatchGroup = DispatchGroup()
-            var resultAssets = [RGAsset]()
-            
-            let options = PHContentEditingInputRequestOptions()
-            options.isNetworkAccessAllowed = true
-            options.canHandleAdjustmentData = {(adjustmeta: PHAdjustmentData) -> Bool in
-                return false
-            }
+            var resultAssets = [RGAsset](repeating: RGAsset.empty, count: assets.count)
             
             for (index, asset) in assets.enumerated() {
                 dispatchGroup.enter()
@@ -191,14 +185,17 @@ class RGAssetsViewController: UICollectionViewController {
                         height: Int(croppedImage.image.size.height)
                     )
                     
-                    resultAssets.append(croppedAsset)
+                    resultAssets[index] = croppedAsset
                     dispatchGroup.leave()
                     
                 } else {
                     if resource.uniformTypeIdentifier == "public.heic" {
                         let targetSize = CGSize(width: asset.pixelWidth, height: asset.pixelHeight)
-                        imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFill, options: nil) { (image, info) in
-                            if let image = image, image.size == targetSize {
+                        let options = PHImageRequestOptions()
+                        options.deliveryMode = .highQualityFormat
+                        
+                        imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFill, options: options) { (image, info) in
+                            if let image = image {
                                 try? image
                                     .jpegData(compressionQuality: 0.9)?
                                     .write(to: fileUrl, options: [.atomic])
@@ -210,15 +207,28 @@ class RGAssetsViewController: UICollectionViewController {
                                     height: Int(targetSize.height)
                                 )
                                 
-                                resultAssets.append(originalAsset)
+                                resultAssets[index] = originalAsset
                                 dispatchGroup.leave()
                             }
                         }
                     } else {
                         var originalAsset = RGAsset.create(from: asset)
-                        originalAsset.filePath = resource.fileURL
-                        resultAssets.append(originalAsset)
-                        dispatchGroup.leave()
+                        
+                        let filePath = resource.fileURL
+                        
+                        if filePath.isEmpty {
+                            asset.getURL { (url) in
+                                if let path = url?.absoluteString {
+                                    originalAsset.filePath = path
+                                    resultAssets[index] = originalAsset
+                                    dispatchGroup.leave()
+                                }
+                            }
+                        } else {
+                            originalAsset.filePath = filePath
+                            resultAssets[index] = originalAsset
+                            dispatchGroup.leave()
+                        }
                     }
                 }
             }

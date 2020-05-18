@@ -14,7 +14,7 @@ extension RGAlbumsViewController: PHPhotoLibraryChangeObserver {
     func reloadIfFirstTime() -> Bool {
         let status = PHPhotoLibrary.authorizationStatus()
         
-        if self.authorizationStatus == .notDetermined && status == .authorized {
+        if self.authorizationStatus != .authorized && status == .authorized {
             self.authorizationStatus = .authorized
             self.fetchAlbums()
             DispatchQueue.main.async {

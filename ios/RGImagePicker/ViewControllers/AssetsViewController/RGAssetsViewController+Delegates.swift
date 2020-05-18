@@ -22,15 +22,16 @@ extension RGAssetsViewController {
         if let cell = collectionView.cellForItem(at: indexPath) as? RGAssetCell,
             let asset = self.fetchResult?[indexPath.item], asset.mediaType == .image {
             let targetSize = CGSize(width: asset.pixelWidth, height: asset.pixelHeight)
+            let options = PHImageRequestOptions()
+            options.deliveryMode = .highQualityFormat
             
             self.imageManager.requestImage(
                 for: asset,
                 targetSize: targetSize,
                 contentMode: .aspectFill,
-                options: nil) { (image, info) in
+                options: options) { (image, info) in
                     if let image = image,
                         cell.tag == indexPath.item,
-                        image.size == targetSize,
                         let imagePickerController = self.imagePickerController {
                         let cropViewController = CropViewController(image: image)
                         cropViewController.delegate = self
