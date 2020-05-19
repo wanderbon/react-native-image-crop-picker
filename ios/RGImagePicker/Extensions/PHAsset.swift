@@ -17,8 +17,7 @@ extension PHAsset {
                 return false
             }
             self.requestContentEditingInput(with: options, completionHandler: {(contentEditingInput: PHContentEditingInput?, info: [AnyHashable : Any]) -> Void in
-                guard let contentEditingInput = contentEditingInput else { return }
-                completionHandler(contentEditingInput.fullSizeImageURL as URL?)
+                completionHandler(contentEditingInput?.fullSizeImageURL as URL?)
             })
         } else if self.mediaType == .video {
             let options: PHVideoRequestOptions = PHVideoRequestOptions()

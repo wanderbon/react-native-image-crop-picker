@@ -195,6 +195,7 @@ class RGAssetsViewController: UICollectionViewController {
                         options.deliveryMode = .highQualityFormat
                         
                         imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFill, options: options) { (image, info) in
+                            
                             if let image = image {
                                 try? image
                                     .jpegData(compressionQuality: 0.9)?
@@ -208,12 +209,12 @@ class RGAssetsViewController: UICollectionViewController {
                                 )
                                 
                                 resultAssets[index] = originalAsset
-                                dispatchGroup.leave()
                             }
+                            dispatchGroup.leave()
                         }
                     } else {
                         var originalAsset = RGAsset.create(from: asset)
-                        
+                
                         let filePath = resource.fileURL
                         
                         if filePath.isEmpty || filePath.contains(".plist") {
@@ -221,8 +222,8 @@ class RGAssetsViewController: UICollectionViewController {
                                 if let path = url?.absoluteString {
                                     originalAsset.filePath = path
                                     resultAssets[index] = originalAsset
-                                    dispatchGroup.leave()
                                 }
+                                dispatchGroup.leave()
                             }
                         } else {
                             originalAsset.filePath = filePath
@@ -234,8 +235,11 @@ class RGAssetsViewController: UICollectionViewController {
             }
             
             dispatchGroup.notify(queue: .main) {
+                let emptyFreeAssets = resultAssets.filter { (asset) -> Bool in
+                    return !asset.isEmpty
+                }
                 self.dismiss(animated: true) {
-                    imagePickerController.delegate?.imagePickerController(imagePickerController, didFinishPickingAssets: resultAssets)
+                    imagePickerController.delegate?.imagePickerController(imagePickerController, didFinishPickingAssets: emptyFreeAssets)
                 }
             }
         }

@@ -23,6 +23,11 @@ struct RGAsset {
         return RGAsset(fileName: filename, filePath: filepath, width: asset.pixelWidth, height: asset.pixelHeight)
     }
     
+    var isEmpty: Bool {
+        let empty = RGAsset.empty
+        return self.fileName == empty.fileName && self.filePath == empty.filePath
+    }
+    
     static var empty: RGAsset {
         return RGAsset(fileName: "", filePath: "", width: 0, height: 0)
     }
