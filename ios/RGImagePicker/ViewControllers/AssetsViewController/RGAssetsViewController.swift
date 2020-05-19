@@ -93,14 +93,14 @@ class RGAssetsViewController: UICollectionViewController {
         self.collectionView.reloadData()
         
         // Scroll to bottom
-        if let fetchResult = self.fetchResult, fetchResult.count > 0 && self.isMovingToParent && !self.disableScrollToBottom {
+        //if let fetchResult = self.fetchResult, fetchResult.count > 0 && self.isMovingToParent && !self.disableScrollToBottom {
             // when presenting as a .FormSheet on iPad, the frame is not correct until just after viewWillAppear:
             // dispatching to the main thread waits one run loop until the frame is update and the layout is complete
             //DispatchQueue.main.async {
-            let indexPath = IndexPath(item: fetchResult.count - 1, section: 0)
-            self.collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
+            //let indexPath = IndexPath(item: fetchResult.count - 1, section: 0)
+            //self.collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
             //}
-        }
+        //}
     }
     
     
@@ -189,7 +189,7 @@ class RGAssetsViewController: UICollectionViewController {
                     dispatchGroup.leave()
                     
                 } else {
-                    if resource.uniformTypeIdentifier == "public.heic" {
+                    if resource.uniformTypeIdentifier == "public.heic" || resource.type == .pairedVideo {
                         let targetSize = CGSize(width: asset.pixelWidth, height: asset.pixelHeight)
                         let options = PHImageRequestOptions()
                         options.deliveryMode = .highQualityFormat
