@@ -222,8 +222,32 @@ class RGAssetsViewController: UICollectionViewController {
                                 if let path = url?.absoluteString {
                                     originalAsset.filePath = path
                                     resultAssets[index] = originalAsset
+                                    dispatchGroup.leave()
+                                } else {
+                                    let targetSize = CGSize(width: asset.pixelWidth, height: asset.pixelHeight)
+                                    let options = PHImageRequestOptions()
+                                    options.deliveryMode = .highQualityFormat
+                                    
+                                    self.imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFill, options: options) { (image, info) in
+                                        
+                                        if let image = image {
+                                            try? image
+                                                .jpegData(compressionQuality: 0.9)?
+                                                .write(to: fileUrl, options: [.atomic])
+                                            
+                                            let originalAsset = RGAsset(
+                                                fileName: resource.originalFilename,
+                                                filePath: "file://\(filePath)",
+                                                width: Int(targetSize.width),
+                                                height: Int(targetSize.height)
+                                            )
+                                            
+                                            resultAssets[index] = originalAsset
+                                        }
+                                        
+                                        dispatchGroup.leave()
+                                    }
                                 }
-                                dispatchGroup.leave()
                             }
                         } else {
                             originalAsset.filePath = filePath
