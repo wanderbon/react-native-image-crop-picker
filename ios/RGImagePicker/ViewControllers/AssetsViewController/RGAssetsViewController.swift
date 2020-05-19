@@ -216,7 +216,7 @@ class RGAssetsViewController: UICollectionViewController {
                         
                         let filePath = resource.fileURL
                         
-                        if filePath.isEmpty {
+                        if filePath.isEmpty || filePath.contains(".plist") {
                             asset.getURL { (url) in
                                 if let path = url?.absoluteString {
                                     originalAsset.filePath = path
@@ -250,6 +250,7 @@ class RGAssetsViewController: UICollectionViewController {
         
         if let assetCollection = self.assetCollection {
             let options = PHFetchOptions()
+            options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
             
             switch (imagePickerController.mediaType) {
             case .RGImagePickerMediaTypeImage:
