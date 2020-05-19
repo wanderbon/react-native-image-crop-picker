@@ -151,6 +151,50 @@ class RGAssetsViewController: UICollectionViewController {
         }
     }
     
+    
+    func saveTmpImage(image: UIImage, fileName: String) -> RGAsset {
+        let filePath = RGTmpFilesHelper.generateTmpJPGPath()
+        let fileUrl = URL(fileURLWithPath: filePath)
+        
+        try? image
+            .jpegData(compressionQuality: 0.9)?
+            .write(to: fileUrl, options: [.atomic])
+        
+        let asset = RGAsset(
+            fileName: fileName,
+            filePath: "file://\(filePath)",
+            width: Int(image.size.width),
+            height: Int(image.size.height)
+        )
+        
+        return asset
+    }
+    
+    
+    func requestImage(asset: PHAsset, fileName: String, completion: @escaping (_ asset: RGAsset?) -> ()) {
+        let targetSize = CGSize(width: asset.pixelWidth, height: asset.pixelHeight)
+        let options = PHImageRequestOptions()
+        options.deliveryMode = .highQualityFormat
+        
+        imageManager.requestImage(
+            for: asset,
+            targetSize: targetSize,
+            contentMode: .aspectFill,
+            options: options) { (image, info) in
+                if let image = image {
+                    let originalAsset = self.saveTmpImage(
+                        image: image,
+                        fileName: fileName
+                    )
+                    
+                    completion(originalAsset)
+                } else {
+                    completion(nil)
+                }
+        }
+    }
+    
+    
     @objc func doneTapped() {
         if let imagePickerController = self.imagePickerController,
             let assets = imagePickerController.selectedAssets.array as? [PHAsset] {
@@ -167,22 +211,12 @@ class RGAssetsViewController: UICollectionViewController {
                         continue
                 }
                 
-                let filePath = RGTmpFilesHelper.generateTmpJPGPath()
-                let fileUrl = URL(fileURLWithPath: filePath)
-                
                 if self.croppedImages.keys.contains(path),
                     let croppedImage = self.croppedImages[path] {
-                    
-                    try? croppedImage
-                        .image
-                        .jpegData(compressionQuality: 0.9)?
-                        .write(to: fileUrl, options: [.atomic])
-                    
-                    let croppedAsset = RGAsset(
-                        fileName: resource.originalFilename,
-                        filePath: "file://\(filePath)",
-                        width: Int(croppedImage.image.size.width),
-                        height: Int(croppedImage.image.size.height)
+   
+                    let croppedAsset = saveTmpImage(
+                        image: croppedImage.image,
+                        fileName: resource.originalFilename
                     )
                     
                     resultAssets[index] = croppedAsset
@@ -190,25 +224,9 @@ class RGAssetsViewController: UICollectionViewController {
                     
                 } else {
                     if resource.uniformTypeIdentifier == "public.heic" || resource.type == .pairedVideo {
-                        let targetSize = CGSize(width: asset.pixelWidth, height: asset.pixelHeight)
-                        let options = PHImageRequestOptions()
-                        options.deliveryMode = .highQualityFormat
-                        
-                        imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFill, options: options) { (image, info) in
-                            
-                            if let image = image {
-                                try? image
-                                    .jpegData(compressionQuality: 0.9)?
-                                    .write(to: fileUrl, options: [.atomic])
-                                
-                                let originalAsset = RGAsset(
-                                    fileName: resource.originalFilename,
-                                    filePath: "file://\(filePath)",
-                                    width: Int(targetSize.width),
-                                    height: Int(targetSize.height)
-                                )
-                                
-                                resultAssets[index] = originalAsset
+                        requestImage(asset: asset, fileName: resource.originalFilename) { (asset) in
+                            if let asset = asset {
+                                resultAssets[index] = asset
                             }
                             dispatchGroup.leave()
                         }
@@ -224,27 +242,10 @@ class RGAssetsViewController: UICollectionViewController {
                                     resultAssets[index] = originalAsset
                                     dispatchGroup.leave()
                                 } else {
-                                    let targetSize = CGSize(width: asset.pixelWidth, height: asset.pixelHeight)
-                                    let options = PHImageRequestOptions()
-                                    options.deliveryMode = .highQualityFormat
-                                    
-                                    self.imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFill, options: options) { (image, info) in
-                                        
-                                        if let image = image {
-                                            try? image
-                                                .jpegData(compressionQuality: 0.9)?
-                                                .write(to: fileUrl, options: [.atomic])
-                                            
-                                            let originalAsset = RGAsset(
-                                                fileName: resource.originalFilename,
-                                                filePath: "file://\(filePath)",
-                                                width: Int(targetSize.width),
-                                                height: Int(targetSize.height)
-                                            )
-                                            
-                                            resultAssets[index] = originalAsset
+                                    self.requestImage(asset: asset, fileName: resource.originalFilename) { (asset) in
+                                        if let asset = asset {
+                                            resultAssets[index] = asset
                                         }
-                                        
                                         dispatchGroup.leave()
                                     }
                                 }
