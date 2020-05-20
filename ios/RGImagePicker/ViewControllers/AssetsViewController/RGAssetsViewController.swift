@@ -171,9 +171,15 @@ class RGAssetsViewController: UICollectionViewController {
         let filePath = RGTmpFilesHelper.generateTmpJPGPath()
         let fileUrl = URL(fileURLWithPath: filePath)
         
-        try? image
-            .jpegData(compressionQuality: 0.9)?
-            .write(to: fileUrl, options: [.atomic])
+        if fileName.uppercased().contains("PNG") {
+            try? image
+                .pngData()?
+                .write(to: fileUrl, options: [.atomic])
+        } else {
+            try? image
+                .jpegData(compressionQuality: 0.9)?
+                .write(to: fileUrl, options: [.atomic])
+        }
         
         let asset = RGAsset(
             fileName: fileName,
