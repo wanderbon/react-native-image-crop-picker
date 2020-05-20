@@ -10,15 +10,13 @@ import Photos
 
 extension PHAssetResource {
     var fileURL: String {
-        let regex = try! NSRegularExpression(pattern: "(?<=fileURL: ).*(?=\\s)")
-        if let result = regex.firstMatch(
-            in: debugDescription,
-            options: [],
-            range: NSRange(location: 0, length: debugDescription.count)) {
-            if let range = Range(result.range, in: debugDescription) {
-                return String(debugDescription[range])
-            }
+        if let fileUrl = self.value(forKey: "privateFileURL") as? URL {
+            return fileUrl.absoluteString.replacingOccurrences(
+                of: "/Adjustments/Adjustments.plist",
+                with: "/Adjustments/FullSizeRender.jpg"
+            )
         }
+        
         return ""
     }
 }

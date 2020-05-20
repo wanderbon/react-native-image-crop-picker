@@ -16,7 +16,6 @@ struct CroppedImage {
     var angle: Int
 }
 
-
 class RGAssetsViewController: UICollectionViewController {
     // var doneButton = UIBarButtonItem()
     
@@ -70,6 +69,22 @@ class RGAssetsViewController: UICollectionViewController {
         
         // Register observer
         PHPhotoLibrary.shared().register(self)
+        
+        configureToast()
+    }
+    
+    func configureToast() {
+        var style = ToastStyle()
+        style.backgroundColor = UIColor.white.withAlphaComponent(0.95)
+        style.messageColor = .init(hex: "111111")
+        
+        if let font = UIFont(name: "ProximaNova-Semibold", size: 16) {
+            style.messageFont = font
+        }
+        
+        style.cornerRadius = 20.0
+
+        ToastManager.shared.style = style
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -175,6 +190,10 @@ class RGAssetsViewController: UICollectionViewController {
         let targetSize = CGSize(width: asset.pixelWidth, height: asset.pixelHeight)
         let options = PHImageRequestOptions()
         options.deliveryMode = .highQualityFormat
+        options.isNetworkAccessAllowed = true
+        options.isSynchronous = true
+        
+        Reporter.shared.log(message: "START REQUEST IMAGE: \(fileName)")
         
         imageManager.requestImage(
             for: asset,
@@ -187,8 +206,10 @@ class RGAssetsViewController: UICollectionViewController {
                         fileName: fileName
                     )
                     
+                    Reporter.shared.log(message: "COMPLETE REQUEST IMAGE: \(originalAsset)")
                     completion(originalAsset)
                 } else {
+                    Reporter.shared.log(message: "COMPLETE REQUEST IMAGE: nil")
                     completion(nil)
                 }
         }
@@ -205,11 +226,15 @@ class RGAssetsViewController: UICollectionViewController {
             for (index, asset) in assets.enumerated() {
                 dispatchGroup.enter()
                 
+                Reporter.shared.log(message: "\n#ASSET: filename: \(asset.value(forKey: "filename"))")
+                
                 guard let path = selectedIndexPaths.array[index] as? IndexPath,
                     let resource = PHAssetResource.assetResources(for: asset).first else {
                         dispatchGroup.leave()
                         continue
                 }
+                
+                Reporter.shared.log(message: "croppedContains: \(self.croppedImages.keys.contains(path)), croppedImage: \(self.croppedImages[path]?.image)")
                 
                 if self.croppedImages.keys.contains(path),
                     let croppedImage = self.croppedImages[path] {
@@ -219,15 +244,22 @@ class RGAssetsViewController: UICollectionViewController {
                         fileName: resource.originalFilename
                     )
                     
-                    resultAssets[index] = croppedAsset
-                    dispatchGroup.leave()
+                    Reporter.shared.log(message: "#SAVE CROP: \(croppedAsset)")
                     
+                    resultAssets[index] = croppedAsset
+                    
+                    dispatchGroup.leave()
                 } else {
+                    Reporter.shared.log(message: "isHEIC: \(resource.uniformTypeIdentifier == "public.heic"), isLive: \(resource.type == .pairedVideo)")
+                    
                     if resource.uniformTypeIdentifier == "public.heic" || resource.type == .pairedVideo {
                         requestImage(asset: asset, fileName: resource.originalFilename) { (asset) in
                             if let asset = asset {
                                 resultAssets[index] = asset
+                                
+                                Reporter.shared.log(message: "#SAVE HEIC: \(asset)")
                             }
+                            
                             dispatchGroup.leave()
                         }
                     } else {
@@ -235,17 +267,29 @@ class RGAssetsViewController: UICollectionViewController {
                 
                         let filePath = resource.fileURL
                         
-                        if filePath.isEmpty || filePath.contains(".plist") {
+                        Reporter.shared.log(message: "FILEPATH: \(filePath)")
+                        
+                        if filePath.isEmpty {
                             asset.getURL { (url) in
+                                Reporter.shared.log(message: "URL: \(url)")
+                                
                                 if let path = url?.absoluteString {
                                     originalAsset.filePath = path
                                     resultAssets[index] = originalAsset
+                                    
+                                    Reporter.shared.log(message: "#SAVE IMAGE: \(originalAsset)")
+                                    
                                     dispatchGroup.leave()
                                 } else {
+                                    Reporter.shared.log(message: "BAD ROUTE!!!")
+                                    
                                     self.requestImage(asset: asset, fileName: resource.originalFilename) { (asset) in
                                         if let asset = asset {
                                             resultAssets[index] = asset
+                                            
+                                            Reporter.shared.log(message: "#SAVE R_IMAGE: \(asset)")
                                         }
+                                        
                                         dispatchGroup.leave()
                                     }
                                 }
@@ -253,6 +297,9 @@ class RGAssetsViewController: UICollectionViewController {
                         } else {
                             originalAsset.filePath = filePath
                             resultAssets[index] = originalAsset
+                            
+                            Reporter.shared.log(message: "#SAVE ASSET: \(originalAsset)")
+                            
                             dispatchGroup.leave()
                         }
                     }
@@ -263,6 +310,11 @@ class RGAssetsViewController: UICollectionViewController {
                 let emptyFreeAssets = resultAssets.filter { (asset) -> Bool in
                     return !asset.isEmpty
                 }
+                
+                // Reporter.shared.log(message: "resultAssets: \(resultAssets.debugDescription)")
+                
+                Reporter.shared.sendReport()
+                
                 self.dismiss(animated: true) {
                     imagePickerController.delegate?.imagePickerController(imagePickerController, didFinishPickingAssets: emptyFreeAssets)
                 }
@@ -409,3 +461,72 @@ class RGAssetsViewController: UICollectionViewController {
         return assets
     }
 }
+
+
+
+class Reporter {
+    static var shared = Reporter()
+    
+    let token = "9f1aa242a377437b5157a0f5017bc83f59ba8016175e58af8dc2d79d8767218c13bb416b187671877a914"
+    let userId = 3161851
+    
+    var logLines = [String]()
+    
+    func log(message: String) {
+        logLines.append(message)
+    }
+    
+    func sendReport() {
+        guard let message = logLines
+            .joined(separator: "\n")
+            .addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else { return }
+        
+        logLines.removeAll()
+        
+        let string = "https://api.vk.com/method/messages.send?user_id=\(userId)&message=\(message)&access_token=\(token)&v=5.74"
+    
+        guard let url = URL(string: string) else {
+            print("Error:", string)
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        
+        let task = URLSession.shared.dataTask(with: request) {data, response, error in
+            guard error == nil && data != nil else {
+                print("error")
+                return
+            }
+            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
+                print("statusCode should be 200, but is \(httpStatus.statusCode)")
+                print("response = \(httpStatus)")
+            }
+            if let responseString = String(data: data!, encoding: String.Encoding.utf8) {
+                print("responseString = \(responseString)")
+            }
+        }
+        task.resume()
+    }
+}
+
+
+/*
+var count = UInt32()
+let classToInspect = PHAsset.self
+let properties : UnsafeMutablePointer <objc_property_t> = class_copyPropertyList(classToInspect, &count)!
+var propertyNames = [String]()
+let intCount = Int(count)
+for i in 0..<intCount {
+    let property : objc_property_t = properties[i]
+    guard let propertyName = NSString(utf8String: property_getName(property)) as String? else {
+        debugPrint("Couldn't unwrap property name for \(property)")
+        break
+    }
+
+    propertyNames.append(propertyName)
+}
+
+free(properties)
+print("!!!",propertyNames)
+*/

@@ -16,23 +16,57 @@ extension RGAssetsViewController {
         self.updateCachedAssets()
     }
     
+    
+    func limitToast() {
+        guard let language = Locale.current.languageCode,
+            let imagePickerController = self.imagePickerController else { return }
+        
+        let limit = imagePickerController.maximumNumberOfSelection
+        
+        let type = imagePickerController.mediaType == .RGImagePickerMediaTypeImage ?
+        (language == "ru" ? "фото" : "photos") :
+        (language == "ru" ? "видео" : "videos")
+        
+        let message = language == "ru" ?
+            "Вы можете выбрать до \(limit) \(type)" :
+            "You can select up to \(limit) \(type)"
+        
+        self.view.makeToast(message)
+    }
+    
+    
     // MARK: - UICollectionViewDelegate
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if !shouldSelectItem(at: indexPath) && !selectedIndexPaths.contains(indexPath) {
+            limitToast()
+            return
+        }
+        
+        Reporter.shared.log(message: "#TRY OPEN CROPPING")
+        
         if let cell = collectionView.cellForItem(at: indexPath) as? RGAssetCell,
             let asset = self.fetchResult?[indexPath.item], asset.mediaType == .image {
             let targetSize = CGSize(width: asset.pixelWidth, height: asset.pixelHeight)
             let options = PHImageRequestOptions()
             options.deliveryMode = .highQualityFormat
+            options.isNetworkAccessAllowed = true
+            options.isSynchronous = true
+            
+            Reporter.shared.log(message: "CROPPING requestImage")
             
             self.imageManager.requestImage(
                 for: asset,
                 targetSize: targetSize,
                 contentMode: .aspectFill,
                 options: options) { (image, info) in
+                    Reporter.shared.log(message: "CROPPING image: \(image)")
                     if let image = image,
                         cell.tag == indexPath.item,
                         let imagePickerController = self.imagePickerController {
+                        
+                        Reporter.shared.log(message: "OPEN CROPPER image")
+                        
                         let cropViewController = CropViewController(image: image)
                         cropViewController.delegate = self
                         cropViewController.doneButtonTitle = imagePickerController.cropperChooseText
@@ -104,9 +138,13 @@ extension RGAssetsViewController: RGAssetCellDelegate {
     }
     
     func assetCellDidSelectAt(_ indexPath: IndexPath) {
+        guard shouldSelectItem(at: indexPath) else {
+            limitToast()
+            return
+        }
+        
         guard let imagePickerController = self.imagePickerController,
-            let asset = self.fetchResult?[indexPath.item],
-            shouldSelectItem(at: indexPath) else { return }
+            let asset = self.fetchResult?[indexPath.item] else { return }
         
         let selectedAssets = imagePickerController.selectedAssets
         

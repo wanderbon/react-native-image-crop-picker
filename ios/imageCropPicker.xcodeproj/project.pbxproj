@@ -49,6 +49,7 @@
 		2572DC432472AB0400DF6AF0 /* RGAssetsViewController+PhotoLibraryObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2572DC3F2472AB0300DF6AF0 /* RGAssetsViewController+PhotoLibraryObserver.swift */; };
 		2572DC442472AB0400DF6AF0 /* RGAssetsViewController+DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2572DC402472AB0400DF6AF0 /* RGAssetsViewController+DataSource.swift */; };
 		2572DC462472AB9400DF6AF0 /* PHAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2572DC452472AB9400DF6AF0 /* PHAsset.swift */; };
+		2572DC7624754FA000DF6AF0 /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2572DC7524754F9F00DF6AF0 /* Toast.swift */; };
 		B3E7B58A1CC2AC0600A0062D /* ImageCropPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* ImageCropPicker.m */; };
 /* End PBXBuildFile section */
 
@@ -148,6 +149,7 @@
 		2572DC3F2472AB0300DF6AF0 /* RGAssetsViewController+PhotoLibraryObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RGAssetsViewController+PhotoLibraryObserver.swift"; sourceTree = "<group>"; };
 		2572DC402472AB0400DF6AF0 /* RGAssetsViewController+DataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RGAssetsViewController+DataSource.swift"; sourceTree = "<group>"; };
 		2572DC452472AB9400DF6AF0 /* PHAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PHAsset.swift; sourceTree = "<group>"; };
+		2572DC7524754F9F00DF6AF0 /* Toast.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* ImageCropPicker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageCropPicker.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -312,6 +314,7 @@
 		1A8C49DE246D3E1400CA4098 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				2572DC7524754F9F00DF6AF0 /* Toast.swift */,
 				1A8C49DF246D3E4100CA4098 /* RGTmpFilesHelper.swift */,
 				1A8C49E1246D3FA400CA4098 /* RGAsset.swift */,
 			);
@@ -487,6 +490,7 @@
 				1A8C49AA2465773A00CA4098 /* CGSize.swift in Sources */,
 				1A8C49EF246DBA0C00CA4098 /* PHFetchOptions.swift in Sources */,
 				1A8C49A72465773A00CA4098 /* CropViewController.swift in Sources */,
+				2572DC7624754FA000DF6AF0 /* Toast.swift in Sources */,
 				2572DC342472AAD000DF6AF0 /* RGImagePickerController.swift in Sources */,
 				1A8C49C52465773A00CA4098 /* TOCropToolbar.m in Sources */,
 			);
