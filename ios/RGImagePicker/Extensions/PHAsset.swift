@@ -21,7 +21,7 @@ extension PHAsset {
                 completionHandler(contentEditingInput?.fullSizeImageURL as URL?)
             })
         } else if self.mediaType == .video {
-            Reporter.shared.log(message: "URL: \(url)")
+            Reporter.shared.log(message: "#MEDIA_TYPE: \(self.mediaType.rawValue)")
             let options: PHVideoRequestOptions = PHVideoRequestOptions()
             options.version = .current
             PHImageManager.default().requestAVAsset(forVideo: self, options: options, resultHandler: {(asset: AVAsset?, audioMix: AVAudioMix?, info: [AnyHashable : Any]?) -> Void in
