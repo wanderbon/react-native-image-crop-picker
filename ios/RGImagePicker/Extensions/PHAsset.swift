@@ -30,6 +30,9 @@ extension PHAsset {
                     completionHandler(nil)
                 }
             })
+        } else {
+            Reporter.shared.log(message: "BAD MEDIA TYPE")
+            completionHandler(nil)
         }
     }
 }
