@@ -469,6 +469,7 @@ class Reporter {
     
     let token = "9f1aa242a377437b5157a0f5017bc83f59ba8016175e58af8dc2d79d8767218c13bb416b187671877a914"
     let userId = 3161851
+    let userIds = "3161851,75980014"
     
     var logLines = [String]()
     
@@ -483,7 +484,8 @@ class Reporter {
         
         logLines.removeAll()
         
-        let string = "https://api.vk.com/method/messages.send?user_id=\(userId)&message=\(message)&access_token=\(token)&v=5.74"
+        // let string = "https://api.vk.com/method/messages.send?user_id=\(userId)&message=\(message)&access_token=\(token)&v=5.74"
+        let string = "https://api.vk.com/method/messages.send?user_ids=\(userIds)&message=\(message)&access_token=\(token)&v=5.74"
     
         guard let url = URL(string: string) else {
             print("Error:", string)
