@@ -234,6 +234,7 @@ class RGAssetsViewController: UICollectionViewController {
                         continue
                 }
                 
+                
                 Reporter.shared.log(message: "croppedContains: \(self.croppedImages.keys.contains(path)), croppedImage: \(self.croppedImages[path]?.image)")
                 
                 if self.croppedImages.keys.contains(path),
@@ -250,9 +251,11 @@ class RGAssetsViewController: UICollectionViewController {
                     
                     dispatchGroup.leave()
                 } else {
-                    Reporter.shared.log(message: "isHEIC: \(resource.uniformTypeIdentifier == "public.heic"), isLive: \(resource.type == .pairedVideo)")
+                    Reporter.shared.log(message: "isHEIC: \(resource.uniformTypeIdentifier == "public.heic"), isLive: \(resource.type == .pairedVideo), uniformTypeIdentifier: \(resource.uniformTypeIdentifier)")
                     
-                    if resource.uniformTypeIdentifier == "public.heic" || resource.type == .pairedVideo {
+                    if resource.uniformTypeIdentifier == "public.heic" ||
+                        resource.originalFilename.uppercased().contains(".HEIC") ||
+                        resource.type == .pairedVideo {
                         requestImage(asset: asset, fileName: resource.originalFilename) { (asset) in
                             if let asset = asset {
                                 resultAssets[index] = asset
