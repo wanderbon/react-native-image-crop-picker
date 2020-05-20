@@ -334,7 +334,7 @@ class RGAssetsViewController: UICollectionViewController {
         
         if let assetCollection = self.assetCollection {
             let options = PHFetchOptions()
-            options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
+            options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
             
             switch (imagePickerController.mediaType) {
             case .RGImagePickerMediaTypeImage:
