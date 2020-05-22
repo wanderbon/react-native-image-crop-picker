@@ -170,6 +170,8 @@ class RGAssetsViewController: UICollectionViewController {
     func saveTmpImage(image: UIImage, fileName: String) -> RGAsset {
         let filePath = RGTmpFilesHelper.generateTmpJPGPath()
         let fileUrl = URL(fileURLWithPath: filePath)
+        let fileName = fileName.contains("Adjustments.plist") ?
+            UUID().uuidString.appending(".JPG") : fileName
         
         try? image
             .jpegData(compressionQuality: 0.9)?
@@ -251,16 +253,20 @@ class RGAssetsViewController: UICollectionViewController {
                     
                     dispatchGroup.leave()
                 } else {
-                    Reporter.shared.log(message: "isHEIC: \(resource.uniformTypeIdentifier == "public.heic"), isLive: \(resource.type == .pairedVideo), uniformTypeIdentifier: \(resource.uniformTypeIdentifier)")
+                    let isHEIC = resource.uniformTypeIdentifier == "public.heic" ||
+                    resource.originalFilename.uppercased().contains(".HEIC")
                     
-                    if resource.uniformTypeIdentifier == "public.heic" ||
-                        resource.originalFilename.uppercased().contains(".HEIC") ||
-                        resource.type == .pairedVideo {
+                    let isLivePhoto = resource.type == .pairedVideo ||
+                        (resource.originalFilename.uppercased().contains(".MOV") && imagePickerController.mediaType == .RGImagePickerMediaTypeImage)
+                    
+                    Reporter.shared.log(message: "isHEIC: \(isHEIC), isLive: \(isLivePhoto), uniformTypeIdentifier: \(resource.uniformTypeIdentifier)")
+                    
+                    if isHEIC || isLivePhoto {
                         requestImage(asset: asset, fileName: resource.originalFilename) { (asset) in
                             if let asset = asset {
                                 resultAssets[index] = asset
                                 
-                                Reporter.shared.log(message: "#SAVE HEIC: \(asset)")
+                                Reporter.shared.log(message: "#SAVE HEIC (or LIVE): \(asset)")
                             }
                             
                             dispatchGroup.leave()
@@ -334,7 +340,7 @@ class RGAssetsViewController: UICollectionViewController {
         
         if let assetCollection = self.assetCollection {
             let options = PHFetchOptions()
-            options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+            options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
             
             switch (imagePickerController.mediaType) {
             case .RGImagePickerMediaTypeImage:
