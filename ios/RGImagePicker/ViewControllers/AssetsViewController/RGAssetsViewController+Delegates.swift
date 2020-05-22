@@ -43,10 +43,14 @@ extension RGAssetsViewController {
             return
         }
         
-        Reporter.shared.log(message: "#TRY OPEN CROPPING")
+        guard let imagePickerController = self.imagePickerController else { return }
+        
+        let isImage = imagePickerController.mediaType == .RGImagePickerMediaTypeImage
+        
+        Reporter.shared.log(message: "#TRY OPEN CROPPING isImage: \(isImage), cellExist: \(collectionView.cellForItem(at: indexPath) as? RGAssetCell != nil)")
         
         if let cell = collectionView.cellForItem(at: indexPath) as? RGAssetCell,
-            let asset = self.fetchResult?[indexPath.item], asset.mediaType == .image {
+            let asset = self.fetchResult?[indexPath.item], isImage {
             let targetSize = CGSize(width: asset.pixelWidth, height: asset.pixelHeight)
             let options = PHImageRequestOptions()
             options.deliveryMode = .highQualityFormat
@@ -61,9 +65,7 @@ extension RGAssetsViewController {
                 contentMode: .aspectFill,
                 options: options) { (image, info) in
                     Reporter.shared.log(message: "CROPPING image: \(image)")
-                    if let image = image,
-                        cell.tag == indexPath.item,
-                        let imagePickerController = self.imagePickerController {
+                    if let image = image, cell.tag == indexPath.item {
                         
                         Reporter.shared.log(message: "OPEN CROPPER image")
                         
