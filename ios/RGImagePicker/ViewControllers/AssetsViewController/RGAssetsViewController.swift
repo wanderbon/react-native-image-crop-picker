@@ -53,7 +53,7 @@ class RGAssetsViewController: UICollectionViewController {
     
     deinit {
         // Unregister observer
-        PHPhotoLibrary.shared().unregisterChangeObserver(self)
+        //PHPhotoLibrary.shared().unregisterChangeObserver(self)
         croppedImages.removeAll()
         croppedIndexPath = nil
     }
@@ -68,7 +68,7 @@ class RGAssetsViewController: UICollectionViewController {
         self.resetCachedAssets()
         
         // Register observer
-        PHPhotoLibrary.shared().register(self)
+        //PHPhotoLibrary.shared().register(self)
         
         configureToast()
     }
@@ -340,7 +340,7 @@ class RGAssetsViewController: UICollectionViewController {
         
         if let assetCollection = self.assetCollection {
             let options = PHFetchOptions()
-            options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
+            options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
             
             switch (imagePickerController.mediaType) {
             case .RGImagePickerMediaTypeImage:

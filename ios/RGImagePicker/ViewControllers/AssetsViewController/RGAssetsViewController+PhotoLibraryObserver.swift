@@ -9,11 +9,11 @@
 import Photos
 
 // MARK: - PHPhotoLibraryChangeObserver
-
+/*
 extension RGAssetsViewController: PHPhotoLibraryChangeObserver {
     func photoLibraryDidChange(_ changeInstance: PHChange) {
         guard let fetchResult = self.fetchResult else { return }
-        
+
         DispatchQueue.main.async {
             if let collectionChanges = changeInstance.changeDetails(for: fetchResult) {
                 // Get the new fetch result
@@ -25,11 +25,13 @@ extension RGAssetsViewController: PHPhotoLibraryChangeObserver {
                 } else {
                     self.collectionView.performBatchUpdates({
                         if let removedIndexes = collectionChanges.removedIndexes, removedIndexes.count > 0 {
-                            self.collectionView.deleteItems(at: removedIndexes.indexPathsFromIndexes(with: 0))
+                            let paths = removedIndexes.indexPathsFromIndexes(with: 0)
+                            self.collectionView.deleteItems(at: paths)
                         }
                         
                         if let insertedIndexes = collectionChanges.insertedIndexes, insertedIndexes.count > 0 {
-                            self.collectionView.insertItems(at: insertedIndexes.indexPathsFromIndexes(with: 0))
+                            let paths = insertedIndexes.indexPathsFromIndexes(with: 0)
+                            self.collectionView.insertItems(at: paths)
                         }
                         
                         if let changedIndexes = collectionChanges.changedIndexes, changedIndexes.count > 0 {
@@ -43,3 +45,4 @@ extension RGAssetsViewController: PHPhotoLibraryChangeObserver {
         }
     }
 }
+*/
