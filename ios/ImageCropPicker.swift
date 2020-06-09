@@ -154,7 +154,7 @@ extension ImageCropPicker: RGImagePickerControllerDelegate {
 extension ImageCropPicker: CropViewControllerDelegate {
     func cropViewController(_ cropViewController: CropViewController, didCropToImage image: UIImage, withRect cropRect: CGRect, angle: Int) {        
         if let imageForCropping = self.imageForCropping,
-            imageForCropping.size != image.size {
+            (imageForCropping.size != image.size || angle != 0) {
             
             self.reject = nil
             
