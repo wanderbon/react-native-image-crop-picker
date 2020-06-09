@@ -73,7 +73,7 @@ class RGAssetsViewController: UICollectionViewController {
         configureToast()
     }
     
-    func configureToast() {
+    func configureToast() {/*
         var style = ToastStyle()
         style.backgroundColor = UIColor.white.withAlphaComponent(0.95)
         style.messageColor = .init(hex: "111111")
@@ -84,7 +84,7 @@ class RGAssetsViewController: UICollectionViewController {
         
         style.cornerRadius = 20.0
 
-        ToastManager.shared.style = style
+        ToastManager.shared.style = style*/
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -195,7 +195,7 @@ class RGAssetsViewController: UICollectionViewController {
         options.isNetworkAccessAllowed = true
         options.isSynchronous = true
         
-        Reporter.shared.log(message: "START REQUEST IMAGE: \(fileName)")
+        //Reporter.shared.log(message: "START REQUEST IMAGE: \(fileName)")
         
         imageManager.requestImage(
             for: asset,
@@ -208,10 +208,10 @@ class RGAssetsViewController: UICollectionViewController {
                         fileName: fileName
                     )
                     
-                    Reporter.shared.log(message: "COMPLETE REQUEST IMAGE: \(originalAsset)")
+                    //Reporter.shared.log(message: "COMPLETE REQUEST IMAGE: \(originalAsset)")
                     completion(originalAsset)
                 } else {
-                    Reporter.shared.log(message: "COMPLETE REQUEST IMAGE: nil")
+                    //Reporter.shared.log(message: "COMPLETE REQUEST IMAGE: nil")
                     completion(nil)
                 }
         }
@@ -228,7 +228,7 @@ class RGAssetsViewController: UICollectionViewController {
             for (index, asset) in assets.enumerated() {
                 dispatchGroup.enter()
                 
-                Reporter.shared.log(message: "\n#ASSET: filename: \(asset.value(forKey: "filename"))")
+                //Reporter.shared.log(message: "\n#ASSET: filename: \(asset.value(forKey: "filename"))")
                 
                 guard let path = selectedIndexPaths.array[index] as? IndexPath,
                     let resource = PHAssetResource.assetResources(for: asset).first else {
@@ -237,7 +237,7 @@ class RGAssetsViewController: UICollectionViewController {
                 }
                 
                 
-                Reporter.shared.log(message: "croppedContains: \(self.croppedImages.keys.contains(path)), croppedImage: \(self.croppedImages[path]?.image)")
+                //Reporter.shared.log(message: "croppedContains: \(self.croppedImages.keys.contains(path)), croppedImage: \(self.croppedImages[path]?.image)")
                 
                 if self.croppedImages.keys.contains(path),
                     let croppedImage = self.croppedImages[path] {
@@ -247,7 +247,7 @@ class RGAssetsViewController: UICollectionViewController {
                         fileName: resource.originalFilename
                     )
                     
-                    Reporter.shared.log(message: "#SAVE CROP: \(croppedAsset)")
+                    //Reporter.shared.log(message: "#SAVE CROP: \(croppedAsset)")
                     
                     resultAssets[index] = croppedAsset
                     
@@ -259,14 +259,14 @@ class RGAssetsViewController: UICollectionViewController {
                     let isLivePhoto = resource.type == .pairedVideo ||
                         (resource.originalFilename.uppercased().contains(".MOV") && imagePickerController.mediaType == .RGImagePickerMediaTypeImage)
                     
-                    Reporter.shared.log(message: "isHEIC: \(isHEIC), isLive: \(isLivePhoto), uniformTypeIdentifier: \(resource.uniformTypeIdentifier)")
+                    //Reporter.shared.log(message: "isHEIC: \(isHEIC), isLive: \(isLivePhoto), uniformTypeIdentifier: \(resource.uniformTypeIdentifier)")
                     
                     if isHEIC || isLivePhoto {
                         requestImage(asset: asset, fileName: resource.originalFilename) { (asset) in
                             if let asset = asset {
                                 resultAssets[index] = asset
                                 
-                                Reporter.shared.log(message: "#SAVE HEIC (or LIVE): \(asset)")
+                                //Reporter.shared.log(message: "#SAVE HEIC (or LIVE): \(asset)")
                             }
                             
                             dispatchGroup.leave()
@@ -276,27 +276,27 @@ class RGAssetsViewController: UICollectionViewController {
                 
                         let filePath = resource.fileURL
                         
-                        Reporter.shared.log(message: "FILEPATH: \(filePath)")
+                        //Reporter.shared.log(message: "FILEPATH: \(filePath)")
                         
                         if filePath.isEmpty {
                             asset.getURL { (url) in
-                                Reporter.shared.log(message: "URL: \(url)")
+                                //Reporter.shared.log(message: "URL: \(url)")
                                 
                                 if let path = url?.absoluteString {
                                     originalAsset.filePath = path
                                     resultAssets[index] = originalAsset
                                     
-                                    Reporter.shared.log(message: "#SAVE IMAGE: \(originalAsset)")
+                                    //Reporter.shared.log(message: "#SAVE IMAGE: \(originalAsset)")
                                     
                                     dispatchGroup.leave()
                                 } else {
-                                    Reporter.shared.log(message: "BAD ROUTE!!!")
+                                    //Reporter.shared.log(message: "BAD ROUTE!!!")
                                     
                                     self.requestImage(asset: asset, fileName: resource.originalFilename) { (asset) in
                                         if let asset = asset {
                                             resultAssets[index] = asset
                                             
-                                            Reporter.shared.log(message: "#SAVE R_IMAGE: \(asset)")
+                                            //Reporter.shared.log(message: "#SAVE R_IMAGE: \(asset)")
                                         }
                                         
                                         dispatchGroup.leave()
@@ -307,7 +307,7 @@ class RGAssetsViewController: UICollectionViewController {
                             originalAsset.filePath = filePath
                             resultAssets[index] = originalAsset
                             
-                            Reporter.shared.log(message: "#SAVE ASSET: \(originalAsset)")
+                            //Reporter.shared.log(message: "#SAVE ASSET: \(originalAsset)")
                             
                             dispatchGroup.leave()
                         }
@@ -322,7 +322,7 @@ class RGAssetsViewController: UICollectionViewController {
                 
                 // Reporter.shared.log(message: "resultAssets: \(resultAssets.debugDescription)")
                 
-                Reporter.shared.sendReport()
+                //Reporter.shared.sendReport()
                 
                 self.dismiss(animated: true) {
                     imagePickerController.delegate?.imagePickerController(imagePickerController, didFinishPickingAssets: emptyFreeAssets)
@@ -472,7 +472,7 @@ class RGAssetsViewController: UICollectionViewController {
 }
 
 
-
+/*
 class Reporter {
     static var shared = Reporter()
     
@@ -519,7 +519,7 @@ class Reporter {
         }
         task.resume()
     }
-}
+}*/
 
 
 /*

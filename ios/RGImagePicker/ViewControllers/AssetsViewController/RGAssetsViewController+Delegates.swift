@@ -47,7 +47,7 @@ extension RGAssetsViewController {
         
         let isImage = imagePickerController.mediaType == .RGImagePickerMediaTypeImage
         
-        Reporter.shared.log(message: "#TRY OPEN CROPPING isImage: \(isImage), cellExist: \(collectionView.cellForItem(at: indexPath) as? RGAssetCell != nil)")
+        //Reporter.shared.log(message: "#TRY OPEN CROPPING isImage: \(isImage), cellExist: \(collectionView.cellForItem(at: indexPath) as? RGAssetCell != nil)")
         
         if let cell = collectionView.cellForItem(at: indexPath) as? RGAssetCell,
             let asset = self.fetchResult?[indexPath.item], isImage {
@@ -57,17 +57,17 @@ extension RGAssetsViewController {
             options.isNetworkAccessAllowed = true
             options.isSynchronous = true
             
-            Reporter.shared.log(message: "CROPPING requestImage")
+            //Reporter.shared.log(message: "CROPPING requestImage")
             
             self.imageManager.requestImage(
                 for: asset,
                 targetSize: targetSize,
                 contentMode: .aspectFill,
                 options: options) { (image, info) in
-                    Reporter.shared.log(message: "CROPPING image: \(image)")
+                    //Reporter.shared.log(message: "CROPPING image: \(image)")
                     if let image = image, cell.tag == indexPath.item {
                         
-                        Reporter.shared.log(message: "OPEN CROPPER image")
+                        //Reporter.shared.log(message: "OPEN CROPPER image")
                         
                         let cropViewController = CropViewController(image: image)
                         cropViewController.delegate = self

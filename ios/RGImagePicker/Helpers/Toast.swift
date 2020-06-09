@@ -754,7 +754,7 @@ public enum ToastPosition {
     
     fileprivate func centerPoint(forToast toast: UIView, inSuperview superview: UIView) -> CGPoint {
         let topPadding: CGFloat = ToastManager.shared.style.verticalPadding + superview.csSafeAreaInsets.top
-        let bottomPadding: CGFloat = ToastManager.shared.style.verticalPadding + superview.csSafeAreaInsets.bottom
+        let bottomPadding: CGFloat = ToastManager.shared.style.verticalPadding + 55 //superview.csSafeAreaInsets.bottom 
         
         switch self {
         case .top:
