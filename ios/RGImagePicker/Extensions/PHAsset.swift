@@ -25,7 +25,31 @@ extension PHAsset {
             let options: PHVideoRequestOptions = PHVideoRequestOptions()
             options.version = .current
             PHImageManager.default().requestAVAsset(forVideo: self, options: options, resultHandler: {(asset: AVAsset?, audioMix: AVAudioMix?, info: [AnyHashable : Any]?) -> Void in
-                if let urlAsset = asset as? AVURLAsset {
+                
+                // Slomo support
+                if let asset = asset, asset.isKind(of: AVComposition.self) {
+                    if let avComposition = asset as? AVComposition,
+                        avComposition.tracks.count > 1,
+                        let exporter = AVAssetExportSession(
+                            asset: avComposition,
+                            presetName: AVAssetExportPresetPassthrough
+                        ) {
+                        let filePath = RGTmpFilesHelper.generateTmpMOVPath()
+
+                        exporter.outputURL = URL(fileURLWithPath: filePath)
+                        exporter.outputFileType = AVFileType.mov
+                        
+                        exporter.exportAsynchronously {
+                            if (exporter.status == .completed) {
+                                if let url = exporter.outputURL {
+                                    completionHandler(url)
+                                }
+                            } else {
+                                completionHandler(nil)
+                            }
+                        }
+                    }
+                } else if let urlAsset = asset as? AVURLAsset {
                     let localVideoUrl: URL = urlAsset.url as URL
                     completionHandler(localVideoUrl)
                 } else {

@@ -229,13 +229,13 @@ class RGAssetsViewController: UICollectionViewController {
                 dispatchGroup.enter()
                 
                 //Reporter.shared.log(message: "\n#ASSET: filename: \(asset.value(forKey: "filename"))")
+                //print("\n#ASSET: filename: \(asset.value(forKey: "filename"))")
                 
                 guard let path = selectedIndexPaths.array[index] as? IndexPath,
                     let resource = PHAssetResource.assetResources(for: asset).first else {
                         dispatchGroup.leave()
                         continue
                 }
-                
                 
                 //Reporter.shared.log(message: "croppedContains: \(self.croppedImages.keys.contains(path)), croppedImage: \(self.croppedImages[path]?.image)")
                 
@@ -259,13 +259,10 @@ class RGAssetsViewController: UICollectionViewController {
                     let isLivePhoto = resource.type == .pairedVideo ||
                         (resource.originalFilename.uppercased().contains(".MOV") && imagePickerController.mediaType == .RGImagePickerMediaTypeImage)
                     
-                    //Reporter.shared.log(message: "isHEIC: \(isHEIC), isLive: \(isLivePhoto), uniformTypeIdentifier: \(resource.uniformTypeIdentifier)")
-                    
                     if isHEIC || isLivePhoto {
                         requestImage(asset: asset, fileName: resource.originalFilename) { (asset) in
                             if let asset = asset {
                                 resultAssets[index] = asset
-                                
                                 //Reporter.shared.log(message: "#SAVE HEIC (or LIVE): \(asset)")
                             }
                             
@@ -273,43 +270,46 @@ class RGAssetsViewController: UICollectionViewController {
                         }
                     } else {
                         var originalAsset = RGAsset.create(from: asset)
-                
+                        
                         let filePath = resource.fileURL
                         
-                        //Reporter.shared.log(message: "FILEPATH: \(filePath)")
-                        
-                        if filePath.isEmpty {
-                            asset.getURL { (url) in
-                                //Reporter.shared.log(message: "URL: \(url)")
-                                
-                                if let path = url?.absoluteString {
-                                    originalAsset.filePath = path
-                                    resultAssets[index] = originalAsset
-                                    
-                                    //Reporter.shared.log(message: "#SAVE IMAGE: \(originalAsset)")
-                                    
-                                    dispatchGroup.leave()
-                                } else {
-                                    //Reporter.shared.log(message: "BAD ROUTE!!!")
-                                    
-                                    self.requestImage(asset: asset, fileName: resource.originalFilename) { (asset) in
-                                        if let asset = asset {
-                                            resultAssets[index] = asset
-                                            
-                                            //Reporter.shared.log(message: "#SAVE R_IMAGE: \(asset)")
-                                        }
-                                        
+                        if imagePickerController.mediaType == .RGImagePickerMediaTypeVideo {
+                            if filePath.lowercased().contains(".mov") {
+                                originalAsset.filePath = filePath
+                                resultAssets[index] = originalAsset
+                                dispatchGroup.leave()
+                            } else {
+                                asset.getURL { (url) in
+                                    if let path = url?.absoluteString {
+                                        originalAsset.filePath = path
+                                        resultAssets[index] = originalAsset
                                         dispatchGroup.leave()
                                     }
                                 }
                             }
                         } else {
-                            originalAsset.filePath = filePath
-                            resultAssets[index] = originalAsset
-                            
-                            //Reporter.shared.log(message: "#SAVE ASSET: \(originalAsset)")
-                            
-                            dispatchGroup.leave()
+                            if filePath.isEmpty {
+                                asset.getURL { (url) in
+                                    if let path = url?.absoluteString {
+                                        originalAsset.filePath = path
+                                        resultAssets[index] = originalAsset
+                                        dispatchGroup.leave()
+                                    } else {
+                                        self.requestImage(asset: asset, fileName: resource.originalFilename) { (asset) in
+                                            if let asset = asset {
+                                                resultAssets[index] = asset
+                                            }
+                                            
+                                            dispatchGroup.leave()
+                                        }
+                                    }
+                                }
+                            } else {
+                                originalAsset.filePath = filePath
+                                resultAssets[index] = originalAsset
+                                
+                                dispatchGroup.leave()
+                            }
                         }
                     }
                 }
@@ -321,8 +321,7 @@ class RGAssetsViewController: UICollectionViewController {
                 }
                 
                 // Reporter.shared.log(message: "resultAssets: \(resultAssets.debugDescription)")
-                
-                //Reporter.shared.sendReport()
+                // Reporter.shared.sendReport()
                 
                 self.dismiss(animated: true) {
                     imagePickerController.delegate?.imagePickerController(imagePickerController, didFinishPickingAssets: emptyFreeAssets)

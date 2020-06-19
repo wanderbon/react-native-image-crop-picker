@@ -22,6 +22,10 @@ struct RGTmpFilesHelper {
         return generateTmpFilePath().appending(".JPG")
     }
     
+    static func generateTmpMOVPath() -> String {
+        return generateTmpFilePath().appending(".MOV")
+    }
+    
     static func removeTmpFiles() {
         let tmpDirectoryPath = NSTemporaryDirectory()
         
