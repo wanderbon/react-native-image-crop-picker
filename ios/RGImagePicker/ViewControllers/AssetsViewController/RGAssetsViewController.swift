@@ -193,7 +193,7 @@ class RGAssetsViewController: UICollectionViewController {
         let options = PHImageRequestOptions()
         options.deliveryMode = .highQualityFormat
         options.isNetworkAccessAllowed = true
-        options.isSynchronous = true
+        // options.isSynchronous = true
         
         //Reporter.shared.log(message: "START REQUEST IMAGE: \(fileName)")
         
@@ -288,6 +288,7 @@ class RGAssetsViewController: UICollectionViewController {
                                 }
                             }
                         } else {
+                            /*
                             if filePath.isEmpty {
                                 asset.getURL { (url) in
                                     if let path = url?.absoluteString {
@@ -307,6 +308,13 @@ class RGAssetsViewController: UICollectionViewController {
                             } else {
                                 originalAsset.filePath = filePath
                                 resultAssets[index] = originalAsset
+                                
+                                dispatchGroup.leave()
+                            }*/
+                            self.requestImage(asset: asset, fileName: resource.originalFilename) { (asset) in
+                                if let asset = asset {
+                                    resultAssets[index] = asset
+                                }
                                 
                                 dispatchGroup.leave()
                             }
