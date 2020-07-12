@@ -55,6 +55,7 @@ extension RGAssetsViewController {
             let options = PHImageRequestOptions()
             options.deliveryMode = .highQualityFormat
             options.isNetworkAccessAllowed = true
+            options.resizeMode = .exact
             options.isSynchronous = true
             
             //Reporter.shared.log(message: "CROPPING requestImage")
