@@ -192,6 +192,7 @@ class RGAssetsViewController: UICollectionViewController {
         let targetSize = CGSize(width: asset.pixelWidth, height: asset.pixelHeight)
         let options = PHImageRequestOptions()
         options.deliveryMode = .highQualityFormat
+        options.resizeMode = .exact
         options.isNetworkAccessAllowed = true
         // options.isSynchronous = true
         
