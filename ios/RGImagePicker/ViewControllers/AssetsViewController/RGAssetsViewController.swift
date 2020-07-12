@@ -174,7 +174,7 @@ class RGAssetsViewController: UICollectionViewController {
             UUID().uuidString.appending(".JPG") : fileName
         
         try? image
-            .jpegData(compressionQuality: 0.9)?
+            .jpegData(compressionQuality: 0.8)?
             .write(to: fileUrl, options: [.atomic])
         
         let asset = RGAsset(
