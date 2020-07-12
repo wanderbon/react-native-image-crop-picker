@@ -162,7 +162,7 @@ extension ImageCropPicker: CropViewControllerDelegate {
             let fileUrl = URL(fileURLWithPath: filePath)
             
             try? image
-                .jpegData(compressionQuality: 0.9)?
+                .jpegData(compressionQuality: 0.8)?
                 .write(to: fileUrl, options: [.atomic])
             
             let response: [String : Any] = [
