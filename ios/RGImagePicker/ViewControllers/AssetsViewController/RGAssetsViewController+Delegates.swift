@@ -74,6 +74,13 @@ extension RGAssetsViewController {
                         cropViewController.delegate = self
                         cropViewController.doneButtonTitle = imagePickerController.cropperChooseText
                         cropViewController.cancelButtonTitle = imagePickerController.cropperCancelText
+                        
+                        if imagePickerController.restrictionMode {
+                            cropViewController.aspectRatioLockEnabled = true
+                            cropViewController.aspectRatioPreset = .presetSquare
+                            cropViewController.resetAspectRatioEnabled = false
+                        }
+                        
                         self.croppedIndexPath = indexPath
                         
                         if let croppedImage = self.croppedImages[indexPath] {
@@ -173,6 +180,10 @@ extension RGAssetsViewController: RGAssetCellDelegate {
             
             UIView.performWithoutAnimation { 
                 self.collectionView.reloadItems(at: self.selectedIndexPaths.array as! [IndexPath])
+            }
+            
+            if imagePickerController.restrictionMode {
+                doneTapped()
             }
         } else {
             imagePickerController.delegate?.imagePickerController(imagePickerController, didFinishPickingAssets: [RGAsset.create(from: asset)])

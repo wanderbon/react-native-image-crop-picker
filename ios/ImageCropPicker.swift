@@ -67,6 +67,10 @@ class ImageCropPicker: NSObject {
                 imagePickerController.maximumNumberOfSelection = maxFiles
             }
             
+            if let restrictionMode = options.object(forKey: "restrictionMode") as? Bool {
+                imagePickerController.restrictionMode = restrictionMode
+            }
+            
             if let mediaType = options.object(forKey: "mediaType") as? String {
                 if mediaType == "photo" {
                     imagePickerController.mediaType = .RGImagePickerMediaTypeImage
@@ -117,6 +121,12 @@ class ImageCropPicker: NSObject {
         
         DispatchQueue.main.async {
             let cropViewController = CropViewController(image: image)
+            
+            if let squareMode = options.object(forKey: "squareMode") as? Bool {
+                cropViewController.aspectRatioLockEnabled = squareMode
+                cropViewController.aspectRatioPreset = .presetSquare
+                cropViewController.resetAspectRatioEnabled = false
+            }
             
             cropViewController.delegate = self
             cropViewController.modalPresentationStyle = .fullScreen

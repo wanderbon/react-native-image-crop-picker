@@ -27,6 +27,7 @@ extension RGAssetsViewController {
         cell.indexPath = indexPath
         cell.delegate = self
         cell.showsOverlayViewWhenSelected = imagePickerController.allowsMultipleSelection
+        cell.checkmarkView.isHidden = imagePickerController.restrictionMode
         
         if let asset = self.fetchResult?[indexPath.item] {
             let itemSize = (collectionView.collectionViewLayout as! UICollectionViewFlowLayout).itemSize

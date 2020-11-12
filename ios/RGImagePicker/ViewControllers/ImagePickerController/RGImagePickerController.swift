@@ -36,6 +36,8 @@ class RGImagePickerController: UIViewController {
     
     var maximumNumberOfSelection = 10
     
+    var restrictionMode = false
+    
     var showsNumberOfSelectedAssets = true
     
     var numberOfColumnsInPortrait = 3
