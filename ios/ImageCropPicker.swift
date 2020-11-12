@@ -118,6 +118,12 @@ class ImageCropPicker: NSObject {
         DispatchQueue.main.async {
             let cropViewController = CropViewController(image: image)
             
+            if let squareMode = options.object(forKey: "squareMode") as? Bool {
+                cropViewController.aspectRatioLockEnabled = squareMode
+                cropViewController.aspectRatioPreset = .presetSquare
+                cropViewController.resetAspectRatioEnabled = false
+            }
+            
             cropViewController.delegate = self
             cropViewController.modalPresentationStyle = .fullScreen
             
