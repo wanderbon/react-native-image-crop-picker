@@ -401,7 +401,8 @@ class RGAssetsViewController: UICollectionViewController {
     }
     
     func updateDoneButtonState() {
-        setDoneButton(visible: self.isMinimumSelectionLimitFulfilled)
+        guard let imagePickerController = self.imagePickerController else { return }
+        setDoneButton(visible: self.isMinimumSelectionLimitFulfilled && !imagePickerController.restrictionMode)
     }
 
     // MARK: - Asset Caching
