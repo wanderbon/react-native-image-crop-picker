@@ -126,6 +126,7 @@ class ImageCropPicker: NSObject {
                 cropViewController.aspectRatioLockEnabled = squareMode
                 cropViewController.aspectRatioPreset = .presetSquare
                 cropViewController.resetAspectRatioEnabled = false
+                cropViewController.squareMode = squareMode
             }
             
             cropViewController.delegate = self
@@ -164,7 +165,7 @@ extension ImageCropPicker: RGImagePickerControllerDelegate {
 extension ImageCropPicker: CropViewControllerDelegate {
     func cropViewController(_ cropViewController: CropViewController, didCropToImage image: UIImage, withRect cropRect: CGRect, angle: Int) {        
         if let imageForCropping = self.imageForCropping,
-            (imageForCropping.size != image.size || angle != 0) {
+            (imageForCropping.size != image.size || angle != 0 || cropViewController.squareMode) {
             
             self.reject = nil
             
