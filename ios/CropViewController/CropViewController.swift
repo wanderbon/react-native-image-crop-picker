@@ -108,6 +108,8 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
         set { toCropViewController.title = newValue }
         get { return toCropViewController.title }
     }
+ 
+    public var squareMode: Bool = false
     
     /**
      If true, when the user hits 'Done', a UIActivityController will appear
