@@ -72,6 +72,7 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
     private static final String E_ERROR_WHILE_CLEANING_FILES = "E_ERROR_WHILE_CLEANING_FILES";
 
     private String mediaType = "any";
+    private boolean squareMode = false;
     private boolean multiple = false;
     private boolean includeBase64 = false;
     private boolean includeExif = false;
@@ -124,24 +125,32 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
 
     private void setConfiguration(final ReadableMap options) {
         mediaType = options.hasKey("mediaType") ? options.getString("mediaType") : "any";
+        squareMode = options.hasKey("squareMode") && options.getBoolean("squareMode");
         multiple = options.hasKey("multiple") && options.getBoolean("multiple");
         includeBase64 = options.hasKey("includeBase64") && options.getBoolean("includeBase64");
         includeExif = options.hasKey("includeExif") && options.getBoolean("includeExif");
         width = options.hasKey("width") ? options.getInt("width") : 0;
         height = options.hasKey("height") ? options.getInt("height") : 0;
+
+        width = squareMode ? 100 : width;
+        height = squareMode ? 100 : height;
+
         cropping = options.hasKey("cropping") && options.getBoolean("cropping");
         cropperActiveWidgetColor = options.hasKey("cropperActiveWidgetColor") ? options.getString("cropperActiveWidgetColor") : DEFAULT_TINT;
         cropperStatusBarColor = options.hasKey("cropperStatusBarColor") ? options.getString("cropperStatusBarColor") : DEFAULT_TINT;
         cropperToolbarColor = options.hasKey("cropperToolbarColor") ? options.getString("cropperToolbarColor") : DEFAULT_TINT;
         cropperToolbarTitle = options.hasKey("cropperToolbarTitle") ? options.getString("cropperToolbarTitle") : null;
         cropperCircleOverlay = options.hasKey("cropperCircleOverlay") && options.getBoolean("cropperCircleOverlay");
-        freeStyleCropEnabled = options.hasKey("freeStyleCropEnabled") && options.getBoolean("freeStyleCropEnabled");
+
+        freeStyleCropEnabled = options.hasKey("freeStyleCropEnabled") && !squareMode && options.getBoolean("freeStyleCropEnabled");
+
         showCropGuidelines = !options.hasKey("showCropGuidelines") || options.getBoolean("showCropGuidelines");
         showCropFrame = !options.hasKey("showCropFrame") || options.getBoolean("showCropFrame");
         hideBottomControls = options.hasKey("hideBottomControls") && options.getBoolean("hideBottomControls");
         enableRotationGesture = options.hasKey("enableRotationGesture") && options.getBoolean("enableRotationGesture");
         disableCropperColorSetters = options.hasKey("disableCropperColorSetters") && options.getBoolean("disableCropperColorSetters");
         useFrontCamera = options.hasKey("useFrontCamera") && options.getBoolean("useFrontCamera");
+
         this.options = options;
     }
 
@@ -652,7 +661,8 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         options.setFreeStyleCropEnabled(freeStyleCropEnabled);
         options.setShowCropGrid(showCropGuidelines);
         options.setShowCropFrame(showCropFrame);
-        options.setHideBottomControls(hideBottomControls);
+        options.setHideBottomControls(squareMode ? true : hideBottomControls);
+
         if (cropperToolbarTitle != null) {
             options.setToolbarTitle(cropperToolbarTitle);
         }
@@ -673,8 +683,11 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
                 .withOptions(options);
 
         if (width > 0 && height > 0) {
-            uCrop.withAspectRatio(width, height);
+            uCrop = uCrop.withAspectRatio(width, height);
+            uCrop = uCrop.withMaxResultSize(width, height);
         }
+
+        uCrop = uCrop.withFreeStyleCropEnabled(freeStyleCropEnabled);
 
         uCrop.start(activity);
     }
