@@ -680,69 +680,56 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         }
 
         if(uri.getPath().contains("gif")) {
-            GifDecoder gifDecoder = new GifDecoder();
+            File file = new File(uri.getPath());
+            BitmapFactory.Options original = null;
 
-            InputStream iStream = null;
             try {
-                iStream = reactContext.getContentResolver().openInputStream(uri);
-            } catch (FileNotFoundException e) {
+                original = validateImage(uri.getPath());
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-            byte[] inputData = new byte[0];
-            try {
-                inputData = GifDecoder.getBytes(iStream);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            gifDecoder.read(inputData);
 
-            Bitmap bitmap;
+            if(original != null) {
+                long fileLength = file.length();
+                int fileWidth = original.outWidth;
+                int fileHeight = original.outHeight;
+                
+                if((fileWidth > 100 || fileHeight > 100 || (fileLength / 1024) > 100) && squareMode) {
+                    resultCollector.notifyProblem("BIG_SIZE", "Big size");
+                    return;
+                } else if(fileWidth == 0 || fileHeight == 0 || fileLength == 0) {
+                    resultCollector.notifyProblem("SMALL_SIZE", "Small size");
+                    return;
+                } else {
+                    WritableMap result = null;
+                    try {
+                        result = getSelection(activity, uri, false);
+                    } catch (Exception e) {
+                        resultCollector.notifyProblem("ERROR", e.getMessage());
+                        return;
+                    }
 
-            final int frameCount = gifDecoder.getFrameCount();
+                    if (result != null) {
+                        WritableMap data = new WritableNativeMap();
 
-            if(frameCount > 0) {
-                gifDecoder.advance();
-                bitmap = Bitmap.createBitmap(gifDecoder.getNextFrame());
+                        data.putInt("x", -1);
+                        data.putInt("y", -1);
+                        data.putInt("width", fileWidth);
+                        data.putInt("height", fileHeight);
 
-                String originalPath = uri.getPath();
-                String folder = originalPath.substring(0, originalPath.lastIndexOf('/') + 1);
-                String fileName = originalPath.substring(originalPath.lastIndexOf('/')  + 1, originalPath.lastIndexOf('.')) + ".JPEG";
+                        result.putMap("cropRect", data);
 
-                File f = new File(folder, fileName);
-                try {
-                    f.createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                        resultCollector.setWaitCount(1);
+                        resultCollector.notifySuccess(result);
+                        return;
+                    } else {
+                        resultCollector.notifyProblem("ERROR", "Some error");
+                        return;
+                    }
                 }
-
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
-                byte[] bitmapdata = bos.toByteArray();
-
-                FileOutputStream fos = null;
-                try {
-                    fos = new FileOutputStream(f);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    fos.write(bitmapdata);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    fos.flush();
-                } catch (IOException e) {
-                    e.printStackTrace();
-
-                }
-                try {
-                    fos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                uri = Uri.parse("file://" + f.getPath());
+            } else {
+                resultCollector.notifyProblem(E_NO_IMAGE_DATA_FOUND, "Cannot find image data");
+                return;
             }
         }
 
