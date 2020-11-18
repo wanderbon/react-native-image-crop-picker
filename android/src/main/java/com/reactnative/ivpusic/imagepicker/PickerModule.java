@@ -42,6 +42,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.CookieHandler;
@@ -653,7 +654,7 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         }
     }
 
-    private void startCropping(final Activity activity, final Uri uri) {
+    private void startCropping(final Activity activity, Uri uri) {
         UCrop.Options options = new UCrop.Options();
         options.setCompressionFormat(Bitmap.CompressFormat.JPEG);
         options.setCompressionQuality(100);
@@ -676,6 +677,73 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         }
         if (!disableCropperColorSetters) {
             configureCropperColors(options);
+        }
+
+        if(uri.getPath().contains("gif")) {
+            GifDecoder gifDecoder = new GifDecoder();
+
+            InputStream iStream = null;
+            try {
+                iStream = reactContext.getContentResolver().openInputStream(uri);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            byte[] inputData = new byte[0];
+            try {
+                inputData = GifDecoder.getBytes(iStream);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            gifDecoder.read(inputData);
+
+            Bitmap bitmap;
+
+            final int frameCount = gifDecoder.getFrameCount();
+
+            if(frameCount > 0) {
+                gifDecoder.advance();
+                bitmap = Bitmap.createBitmap(gifDecoder.getNextFrame());
+
+                String originalPath = uri.getPath();
+                String folder = originalPath.substring(0, originalPath.lastIndexOf('/') + 1);
+                String fileName = originalPath.substring(originalPath.lastIndexOf('/')  + 1, originalPath.lastIndexOf('.')) + ".JPEG";
+
+                File f = new File(folder, fileName);
+                try {
+                    f.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+                byte[] bitmapdata = bos.toByteArray();
+
+                FileOutputStream fos = null;
+                try {
+                    fos = new FileOutputStream(f);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    fos.write(bitmapdata);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    fos.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+
+                }
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                uri = Uri.parse("file://" + f.getPath());
+            }
         }
 
         UCrop uCrop = UCrop
