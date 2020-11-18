@@ -42,6 +42,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.CookieHandler;
@@ -72,6 +73,7 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
     private static final String E_ERROR_WHILE_CLEANING_FILES = "E_ERROR_WHILE_CLEANING_FILES";
 
     private String mediaType = "any";
+    private boolean squareMode = false;
     private boolean multiple = false;
     private boolean includeBase64 = false;
     private boolean includeExif = false;
@@ -124,24 +126,32 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
 
     private void setConfiguration(final ReadableMap options) {
         mediaType = options.hasKey("mediaType") ? options.getString("mediaType") : "any";
+        squareMode = options.hasKey("squareMode") && options.getBoolean("squareMode");
         multiple = options.hasKey("multiple") && options.getBoolean("multiple");
         includeBase64 = options.hasKey("includeBase64") && options.getBoolean("includeBase64");
         includeExif = options.hasKey("includeExif") && options.getBoolean("includeExif");
         width = options.hasKey("width") ? options.getInt("width") : 0;
         height = options.hasKey("height") ? options.getInt("height") : 0;
+
+        width = squareMode ? 100 : width;
+        height = squareMode ? 100 : height;
+
         cropping = options.hasKey("cropping") && options.getBoolean("cropping");
         cropperActiveWidgetColor = options.hasKey("cropperActiveWidgetColor") ? options.getString("cropperActiveWidgetColor") : DEFAULT_TINT;
         cropperStatusBarColor = options.hasKey("cropperStatusBarColor") ? options.getString("cropperStatusBarColor") : DEFAULT_TINT;
         cropperToolbarColor = options.hasKey("cropperToolbarColor") ? options.getString("cropperToolbarColor") : DEFAULT_TINT;
         cropperToolbarTitle = options.hasKey("cropperToolbarTitle") ? options.getString("cropperToolbarTitle") : null;
         cropperCircleOverlay = options.hasKey("cropperCircleOverlay") && options.getBoolean("cropperCircleOverlay");
-        freeStyleCropEnabled = options.hasKey("freeStyleCropEnabled") && options.getBoolean("freeStyleCropEnabled");
+
+        freeStyleCropEnabled = options.hasKey("freeStyleCropEnabled") && !squareMode && options.getBoolean("freeStyleCropEnabled");
+
         showCropGuidelines = !options.hasKey("showCropGuidelines") || options.getBoolean("showCropGuidelines");
         showCropFrame = !options.hasKey("showCropFrame") || options.getBoolean("showCropFrame");
         hideBottomControls = options.hasKey("hideBottomControls") && options.getBoolean("hideBottomControls");
         enableRotationGesture = options.hasKey("enableRotationGesture") && options.getBoolean("enableRotationGesture");
         disableCropperColorSetters = options.hasKey("disableCropperColorSetters") && options.getBoolean("disableCropperColorSetters");
         useFrontCamera = options.hasKey("useFrontCamera") && options.getBoolean("useFrontCamera");
+
         this.options = options;
     }
 
@@ -644,7 +654,7 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         }
     }
 
-    private void startCropping(final Activity activity, final Uri uri) {
+    private void startCropping(final Activity activity, Uri uri) {
         UCrop.Options options = new UCrop.Options();
         options.setCompressionFormat(Bitmap.CompressFormat.JPEG);
         options.setCompressionQuality(100);
@@ -652,7 +662,8 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         options.setFreeStyleCropEnabled(freeStyleCropEnabled);
         options.setShowCropGrid(showCropGuidelines);
         options.setShowCropFrame(showCropFrame);
-        options.setHideBottomControls(hideBottomControls);
+        options.setHideBottomControls(squareMode ? true : hideBottomControls);
+
         if (cropperToolbarTitle != null) {
             options.setToolbarTitle(cropperToolbarTitle);
         }
@@ -668,13 +679,70 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
             configureCropperColors(options);
         }
 
+        if(uri.getPath().contains("gif")) {
+            File file = new File(uri.getPath());
+            BitmapFactory.Options original = null;
+
+            try {
+                original = validateImage(uri.getPath());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if(original != null) {
+                long fileLength = file.length();
+                int fileWidth = original.outWidth;
+                int fileHeight = original.outHeight;
+                
+                if((fileWidth > 100 || fileHeight > 100 || (fileLength / 1024) > 100) && squareMode) {
+                    resultCollector.notifyProblem("BIG_SIZE", "Big size");
+                    return;
+                } else if(fileWidth == 0 || fileHeight == 0 || fileLength == 0) {
+                    resultCollector.notifyProblem("SMALL_SIZE", "Small size");
+                    return;
+                } else {
+                    WritableMap result = null;
+                    try {
+                        result = getSelection(activity, uri, false);
+                    } catch (Exception e) {
+                        resultCollector.notifyProblem("ERROR", e.getMessage());
+                        return;
+                    }
+
+                    if (result != null) {
+                        WritableMap data = new WritableNativeMap();
+
+                        data.putInt("x", -1);
+                        data.putInt("y", -1);
+                        data.putInt("width", fileWidth);
+                        data.putInt("height", fileHeight);
+
+                        result.putMap("cropRect", data);
+
+                        resultCollector.setWaitCount(1);
+                        resultCollector.notifySuccess(result);
+                        return;
+                    } else {
+                        resultCollector.notifyProblem("ERROR", "Some error");
+                        return;
+                    }
+                }
+            } else {
+                resultCollector.notifyProblem(E_NO_IMAGE_DATA_FOUND, "Cannot find image data");
+                return;
+            }
+        }
+
         UCrop uCrop = UCrop
                 .of(uri, Uri.fromFile(new File(this.getTmpDir(activity), UUID.randomUUID().toString() + ".jpg")))
                 .withOptions(options);
 
         if (width > 0 && height > 0) {
-            uCrop.withAspectRatio(width, height);
+            uCrop = uCrop.withAspectRatio(width, height);
+            uCrop = uCrop.withMaxResultSize(width, height);
         }
+
+        uCrop = uCrop.withFreeStyleCropEnabled(freeStyleCropEnabled);
 
         uCrop.start(activity);
     }
