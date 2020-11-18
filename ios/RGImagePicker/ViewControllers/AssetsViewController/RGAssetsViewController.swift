@@ -312,12 +312,26 @@ class RGAssetsViewController: UICollectionViewController {
                                 
                                 dispatchGroup.leave()
                             }*/
-                            self.requestImage(asset: asset, fileName: resource.originalFilename) { (asset) in
-                                if let asset = asset {
-                                    resultAssets[index] = asset
-                                }
+                            
+                            
+                            if resource.uniformTypeIdentifier.contains(".gif") {
+                                let asset = RGAsset(
+                                    fileName: resource.originalFilename,
+                                    filePath: resource.fileURL,
+                                    width: asset.pixelWidth,
+                                    height: asset.pixelHeight
+                                )
                                 
+                                resultAssets[index] = asset
                                 dispatchGroup.leave()
+                            } else {
+                                self.requestImage(asset: asset, fileName: resource.originalFilename) { (asset) in
+                                    if let asset = asset {
+                                        resultAssets[index] = asset
+                                    }
+                                    
+                                    dispatchGroup.leave()
+                                }
                             }
                         }
                     }

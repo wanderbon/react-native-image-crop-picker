@@ -60,12 +60,20 @@ extension RGAssetsViewController {
             
             //Reporter.shared.log(message: "CROPPING requestImage")
             
+            if let resource = PHAssetResource.assetResources(for: asset).first {
+                if resource.uniformTypeIdentifier.contains(".gif") {
+                    self.assetCellDidSelectAt(indexPath)
+                    return
+                }
+            }
+            
             self.imageManager.requestImage(
                 for: asset,
                 targetSize: targetSize,
                 contentMode: .aspectFill,
                 options: options) { (image, info) in
                     //Reporter.shared.log(message: "CROPPING image: \(image)")
+                
                     if let image = image, cell.tag == indexPath.item {
                         
                         //Reporter.shared.log(message: "OPEN CROPPER image")
