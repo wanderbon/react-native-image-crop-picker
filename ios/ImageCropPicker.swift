@@ -214,7 +214,7 @@ func getRemoteFileSize(url: URL) -> Int64 {
 
 
 func isGif(_ filePath: String) -> Bool {
-    return return (filePath.split(separator: ".").last ?? "").lowercased().contains("gif")
+    return (filePath.split(separator: ".").last ?? "").lowercased().contains("gif")
 }
 
 func isBadGif(filePath: String, size: CGSize, fileSize: UInt64) -> Bool {
