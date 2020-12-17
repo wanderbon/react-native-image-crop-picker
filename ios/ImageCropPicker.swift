@@ -64,6 +64,11 @@ class ImageCropPicker: NSObject {
             
             imagePickerController.delegate = self
             
+            if let navElementsColor = options.object(forKey: "navElementsColor") as? String {
+                imagePickerController.backgroundColor = ColorsHelper.parseColor(color: navElementsColor)
+                imagePickerController.setUpAlbumsViewController()
+            }
+            
             if let maxFiles = options.object(forKey: "maxFiles") as? Int {
                 imagePickerController.maximumNumberOfSelection = maxFiles
             }
