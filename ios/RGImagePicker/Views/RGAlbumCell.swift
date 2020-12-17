@@ -22,6 +22,11 @@ class RGAlbumCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        self.backgroundColor = Colors.backgroundColor
+        titleLabel.textColor = Colors.primaryTextColor
+        countLabel.textColor = Colors.subTextColor
+        
+        setDisclosure(toColour: Colors.subTextColor)
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -31,6 +36,19 @@ class RGAlbumCell: UITableViewCell {
     }
 }
 
+extension UITableViewCell {
+    func setDisclosure(toColour: UIColor) -> () {
+        for view in self.subviews {
+            if let disclosure = view as? UIButton {
+                if let image = disclosure.backgroundImage(for: .normal) {
+                    let colouredImage = image.withRenderingMode(.alwaysTemplate);
+                    disclosure.setImage(colouredImage, for: .normal)
+                    disclosure.tintColor = toColour
+                }
+            }
+        }
+    }
+}
 //borderRadius: 3,
 //width: width * 0.18,
 //height: width * 0.18,

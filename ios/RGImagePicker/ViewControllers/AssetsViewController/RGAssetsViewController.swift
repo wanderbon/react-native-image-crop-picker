@@ -61,8 +61,9 @@ class RGAssetsViewController: UICollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let frontRect = CGRect(x: 0, y: 0, width: view.frame.width, height: 10)
+        let frontRect = CGRect(x: 0, y: 0, width: view.frame.width, height: 16)
         let front = RGTopRoundedView(frame: frontRect)
+        
         view.addSubview(front)
   
         self.resetCachedAssets()
@@ -103,7 +104,8 @@ class RGAssetsViewController: UICollectionViewController {
         // Configure collection view
                 
         //self.collectionView.allowsMultipleSelection = imagePickerController.allowsMultipleSelection
-
+        
+        self.collectionView.backgroundColor = Colors.backgroundColor
         self.updateDoneButtonState()
         self.collectionView.reloadData()
         

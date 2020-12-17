@@ -19,9 +19,9 @@ class RGTopRoundedView: UIView {
     func tryRoundOff() {
         if roundedView == nil {
             let roundedView = UIView(frame: self.bounds)
-            roundedView.frame.size.height += 10
-            roundedView.backgroundColor = .white
-            self.backgroundColor = .init(hex: "292F31")
+            roundedView.frame.size.height += 16
+            roundedView.backgroundColor = Colors.backgroundColor
+            self.backgroundColor = Colors.navElementsColor
             self.addSubview(roundedView)
             self.roundedView = roundedView
             self.clipsToBounds = true
@@ -35,6 +35,6 @@ class RGTopRoundedView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         tryRoundOff()
-        roundedView?.roundCorners([.topLeft, .topRight], radius: 10)
+        roundedView?.roundCorners([.topLeft, .topRight], radius: 16)
     }
 }

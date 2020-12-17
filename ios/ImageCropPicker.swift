@@ -18,6 +18,13 @@ let ERROR_CROPPER_CANCEL_MSG = "User cancelled image cropping"
 let ERROR_CROPPER_SAME_IMAGE_KEY = "E_CROPPER_ORIGINAL_IMAGE"
 let ERROR_CROPPER_SAME_IMAGE_MSG = "User confirm cropping without changing cropping rect"
 
+class Colors {
+    static var navElementsColor: UIColor = UIColor.init()
+    static var backgroundColor: UIColor = UIColor.init()
+    static var primaryTextColor: UIColor = UIColor.init()
+    static var subTextColor: UIColor = UIColor.init()
+}
+
 
 @objc(ImageCropPicker)
 class ImageCropPicker: NSObject {
@@ -60,14 +67,18 @@ class ImageCropPicker: NSObject {
         }
         
         DispatchQueue.main.async {
-            let imagePickerController = RGImagePickerController()
+            let navElementsColor: String = (options.object(forKey: "navElementsColor") as? String) ?? "014359"
+            let backgroundColor: String = (options.object(forKey: "backgroundColor") as? String) ?? "FFFFFF"
+            let primaryTextColor: String = (options.object(forKey: "primaryTextColor") as? String) ?? "333333"
+            let subTextColor: String = (options.object(forKey: "subTextColor") as? String) ?? "8D999E"
             
+            Colors.navElementsColor = ColorsHelper.parseColor(color: navElementsColor)
+            Colors.backgroundColor = ColorsHelper.parseColor(color: backgroundColor)
+            Colors.primaryTextColor = ColorsHelper.parseColor(color: primaryTextColor)
+            Colors.subTextColor = ColorsHelper.parseColor(color: subTextColor)
+            
+            let imagePickerController: RGImagePickerController = RGImagePickerController();
             imagePickerController.delegate = self
-            
-            if let navElementsColor = options.object(forKey: "navElementsColor") as? String {
-                imagePickerController.navElementsColor = ColorsHelper.parseColor(color: navElementsColor)
-                imagePickerController.setupNavBar()
-            }
             
             if let maxFiles = options.object(forKey: "maxFiles") as? Int {
                 imagePickerController.maximumNumberOfSelection = maxFiles

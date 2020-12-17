@@ -29,6 +29,10 @@ class RGAlbumsViewController: UIViewController {
         tableView?.delegate = self
         tableView?.dataSource = self
         
+        tableView?.backgroundColor = Colors.backgroundColor
+        
+        view.backgroundColor = Colors.backgroundColor
+        
         authorizationStatus = PHPhotoLibrary.authorizationStatus()
         
         if (authorizationStatus == .denied) {

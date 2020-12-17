@@ -50,7 +50,6 @@ class RGImagePickerController: UIViewController {
     var doneButtonTitle = "Save"
     var cropperChooseText = "Done"
     var cropperCancelText = "Cancel"
-    var navElementsColor = UIColor(hex: "014359")
     
     var assetBundle: Bundle {
         let bundle = Bundle(for: type(of: self))
@@ -86,20 +85,13 @@ class RGImagePickerController: UIViewController {
         super.viewDidLoad()
     }
     
-    func setupNavBar() {
-        let storyboard = UIStoryboard(name: "RGImagePicker", bundle: self.assetBundle)
-        
-        let navigationController = storyboard.instantiateViewController(withIdentifier: "RGAlbumsNavigationController") as! UINavigationController
-        
-        navigationController.navigationBar.barTintColor = navElementsColor
-    }
-    
     func setUpAlbumsViewController() {
         let storyboard = UIStoryboard(name: "RGImagePicker", bundle: self.assetBundle)
         
         let navigationController = storyboard.instantiateViewController(withIdentifier: "RGAlbumsNavigationController") as! UINavigationController
         
-        navigationController.navigationBar.barTintColor = navElementsColor
+        navigationController.navigationBar.barTintColor = Colors.navElementsColor
+        navigationController.view.backgroundColor = Colors.navElementsColor
         
         navigationController.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
         navigationController.navigationBar.shadowImage = UIImage()

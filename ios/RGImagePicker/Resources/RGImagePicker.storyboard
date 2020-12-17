@@ -77,10 +77,10 @@
                                 <sections/>
                             </tableView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MZG-IH-uYC" customClass="RGTopRoundedView" customModule="RGImagePicker" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="414" height="10"/>
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="16"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="10" id="YhL-Nx-puc"/>
+                                    <constraint firstAttribute="height" constant="16" id="YhL-Nx-puc"/>
                                 </constraints>
                             </view>
                         </subviews>
