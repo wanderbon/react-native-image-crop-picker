@@ -23,9 +23,9 @@ class RGImagePickerController: UIViewController {
     var assetCollectionSubtypes = [
         PHAssetCollectionSubtype.smartAlbumUserLibrary,
         PHAssetCollectionSubtype.albumMyPhotoStream,
-        // PHAssetCollectionSubtype.smartAlbumPanoramas,
         PHAssetCollectionSubtype.smartAlbumVideos,
-        // PHAssetCollectionSubtype.smartAlbumBursts
+        PHAssetCollectionSubtype.smartAlbumFavorites,
+        PHAssetCollectionSubtype.smartAlbumScreenshots,
     ]
     
     var mediaType = RGImagePickerMediaType.RGImagePickerMediaTypeAny
