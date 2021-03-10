@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v7.appcompat.BuildConfig;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
