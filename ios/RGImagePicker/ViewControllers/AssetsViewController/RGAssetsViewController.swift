@@ -21,7 +21,8 @@ class RGAssetsViewController: UICollectionViewController {
     
     weak var imagePickerController: RGImagePickerController?
     
-    var fetchResult: PHFetchResult<PHAsset>?
+    var fetchResult: [PHAsset]?
+    
     var assetCollection: PHAssetCollection? {
         didSet {
             self.selectedIndexPaths.removeAllObjects()
@@ -358,33 +359,30 @@ class RGAssetsViewController: UICollectionViewController {
     
     // MARK: - Fetching Assets
     
+    func reversedAssets(in assetCollection: PHAssetCollection, mediaType: RGImagePickerMediaType) -> [PHAsset] {
+        let options = PHFetchOptions.create(mediaType: mediaType)
+        
+        var fetchResult = [PHAsset]()
+   
+        PHAsset.fetchAssets(in: assetCollection, options: options)
+            .enumerateObjects(options: .reverse) { asset, _, _ in
+                fetchResult.append(asset)
+            }
+        
+        return fetchResult
+    }
+    
     func updateFetchRequest() {
         guard let imagePickerController = self.imagePickerController
             else { return }
         
         if let assetCollection = self.assetCollection {
-            let options = PHFetchOptions()
-            options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-            
-            switch (imagePickerController.mediaType) {
-            case .RGImagePickerMediaTypeImage:
-                options.predicate = NSPredicate(format: "mediaType == %ld", PHAssetMediaType.image.rawValue)
-                break
-                
-            case .RGImagePickerMediaTypeVideo:
-                options.predicate = NSPredicate(format: "mediaType == %ld", PHAssetMediaType.video.rawValue)
-                break
-                
-            default:
-                break
-            }
-            
-            self.fetchResult = PHAsset.fetchAssets(in: assetCollection, options: options)
+            self.fetchResult = reversedAssets(in: assetCollection, mediaType: imagePickerController.mediaType)
             
             if self.isAutoDeselectEnabled && imagePickerController.selectedAssets.count > 0 {
                 // Get index of previous selected asset
                 if let asset = imagePickerController.selectedAssets.firstObject as? PHAsset,
-                    let assetIndex = self.fetchResult?.index(of: asset) {
+                    let assetIndex = self.fetchResult?.firstIndex(of: asset) {
                     self.lastSelectedItemIndexPath = IndexPath(item: assetIndex, section: 0)
                 }
             }
